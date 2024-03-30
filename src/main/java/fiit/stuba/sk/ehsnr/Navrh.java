@@ -3,17 +3,14 @@ package fiit.stuba.sk.ehsnr;
 public abstract class Navrh {
     protected String nazov;
     protected String popis;
-    protected String stav; // Napríklad "Predložený", "V hlasovaní", "Prijatý"
+    protected String stav; // môže byť napríklad "Predložený", "Schválený", "Zamietnutý" atď.
 
-    public Navrh(String nazov, String popis, String stav) {
+    public Navrh(String nazov, String popis) {
         this.nazov = nazov;
         this.popis = popis;
-        this.stav = stav;
+        this.stav = "Predložený"; // predvolený stav pri vytvorení návrhu
     }
 
-    public abstract void aktualizujStav(String novyStav);
-
-    // Gettery a settery
     public String getNazov() {
         return nazov;
     }
@@ -37,4 +34,8 @@ public abstract class Navrh {
     public void setStav(String stav) {
         this.stav = stav;
     }
+
+    public abstract void aktualizujStavNaZakladeHlasovania(Vysledok vysledok);
+
+    // Ďalšie metódy alebo abstraktné metódy, ktoré budú potrebné pre prácu s návrhom
 }
