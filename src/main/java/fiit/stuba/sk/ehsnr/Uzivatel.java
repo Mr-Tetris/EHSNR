@@ -28,7 +28,7 @@ public class Uzivatel {
         uzHlasoval = true;
     }
 
-    // Táto metóda by sa mohla volať na zresetovanie stavu hlasovania (napr. pre novú hlasovaciu session)
+
     public void resetujHlasovanie() {
         uzHlasoval = false;
     }

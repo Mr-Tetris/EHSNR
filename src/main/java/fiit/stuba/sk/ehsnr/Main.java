@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        SystemoveNastavenia nastavenia = new SystemoveNastavenia(); // Táto trieda by mala obsahovať predvolené hodnoty alebo metódy na ich nastavenie
+        SystemoveNastavenia nastavenia = new SystemoveNastavenia();
         HlasovaciSystem hlasovaciSystem = new HlasovaciSystem(nastavenia);
         Sedenie sedenie = new Sedenie(hlasovaciSystem, scanner);
 
@@ -47,7 +47,7 @@ public class Main {
                     }
                     nastavenia.setCasovyLimit(casovyLimit);
 
-                    // Po nastavení parametrov pridáme návrh zákona do agendy sedenia
+
                     ZakonNavrh zakonNavrh = new ZakonNavrh(nazovZakona, informacie.toString());
                     sedenie.pridajNavrhNaAgendu(zakonNavrh);
 
@@ -76,9 +76,8 @@ public class Main {
                     System.out.println("Návrh zákona: " + vybranyNavrh.getNazov());
                     System.out.println("Informácie o zákone: " + vybranyNavrh.getPopis());
 
-                    // Pred hlasovaním je potrebné návrhy z agenda odstrániť alebo ich inak spracovať
-                    sedenie.pridajNavrhNaAgendu(vybranyNavrh); // Pridanie vybraného návrhu späť do agendy, ak je to potrebné
-                    sedenie.zahajSedenie(); // Spustenie hlasovania pre vybraný návrh
+                    sedenie.pridajNavrhNaAgendu(vybranyNavrh);
+                    sedenie.zahajSedenie();
 
                     System.out.println("Hlasovanie sa začalo.");
                     System.out.println("1. Hlasovať za");
@@ -87,9 +86,8 @@ public class Main {
                     System.out.println("4. Pozastaviť hlasovanie");
                     System.out.print("Zadajte vašu voľbu: ");
                     String hlasovanieVolba = scanner.nextLine();
-                    // Spracovanie volby užívateľa (toto bude závisieť na vašej implementácii HlasovaciSystem)
 
-                    // Po spracovaní volby užívateľa:
+
                     System.out.println("Pre ukončenie hlasovania stlačte 'u'.");
                     while (!scanner.nextLine().equalsIgnoreCase("u")) {
                         System.out.println("Neplatný príkaz. Pre ukončenie hlasovania stlačte 'u'.");
@@ -99,7 +97,7 @@ public class Main {
                 case "3":
                     System.out.println("Program bol ukončený.");
                     scanner.close();
-                    return; // Ukončí program
+                    return;
                 default:
                     System.out.println("Neplatná voľba, skúste znova.");
                     break;

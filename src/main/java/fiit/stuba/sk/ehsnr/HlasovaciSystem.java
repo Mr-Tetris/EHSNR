@@ -7,6 +7,7 @@ import java.util.List;
 
 
 public class HlasovaciSystem {
+    //Zapuzdrenie - privatne premenne
     private Map<String, Vysledok> vysledkyHlasovania; // Mapa názvov návrhov na výsledky hlasovania
     private SystemoveNastavenia nastavenia;
     private boolean hlasovanieBezi;
@@ -51,7 +52,6 @@ public class HlasovaciSystem {
             throw new IllegalStateException("Hlasovanie nebolo zahájené.");
         }
         hlasovanieBezi = false;
-        // Logika pre vyhodnotenie hlasovania by sa mohla vykonávať tu alebo po ukončení hlasovania v rámci Sedenia
     }
 
     public synchronized Map<String, Vysledok> getVysledkyHlasovania() {

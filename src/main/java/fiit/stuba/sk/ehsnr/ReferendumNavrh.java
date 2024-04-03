@@ -1,7 +1,9 @@
 package fiit.stuba.sk.ehsnr;
 
 public class ReferendumNavrh extends Navrh {
-    private String otazka; // Otázka, ktorá bude položená v referende
+    //Dedenie konštruktora z triedy Navrh
+    //Polymorfizmus - referenciu typu Navrh môžeme priradiť objekt typu ReferendumNavrh
+    private String otazka;
 
     public ReferendumNavrh(String nazov, String popis, String otazka) {
         super(nazov, popis);
@@ -18,7 +20,6 @@ public class ReferendumNavrh extends Navrh {
 
     @Override
     public void aktualizujStavNaZakladeHlasovania(Vysledok vysledok) {
-        // Toto je zjednodušená logika, která předpokládá, že výsledek obsahuje potřebnou logiku
         if (vysledok.isSchvaleny()) {
             this.stav = "Schválený";
         } else {
