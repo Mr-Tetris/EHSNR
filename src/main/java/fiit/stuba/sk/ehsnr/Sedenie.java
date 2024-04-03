@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Sedenie {
+    // Agregácia - obsahuje referenciu na triedu HlasovaciSystem
     private List<Navrh> navrhyNaAgende;
     private HlasovaciSystem hlasovaciSystem;
     private Scanner scanner;
@@ -12,7 +13,7 @@ public class Sedenie {
     public Sedenie(HlasovaciSystem hlasovaciSystem, Scanner scanner) {
         this.navrhyNaAgende = new ArrayList<>();
         this.hlasovaciSystem = hlasovaciSystem;
-        this.scanner = scanner; // Pridaný Scanner pre čítanie vstupu od užívateľa
+        this.scanner = scanner;
     }
 
     public void pridajNavrhNaAgendu(Navrh navrh) {
@@ -25,7 +26,7 @@ public class Sedenie {
             System.out.println(" - " + navrh.getNazov());
         }
         if (!navrhyNaAgende.isEmpty()) {
-            hlasovaciSystem.zacniHlasovanie(navrhyNaAgende); // Tu bola opravená chýbajúca argumentácia
+            hlasovaciSystem.zacniHlasovanie(navrhyNaAgende);
         } else {
             System.out.println("Nie sú žiadne návrhy na agende.");
         }
@@ -50,7 +51,6 @@ public class Sedenie {
             input = scanner.nextLine();
         }
 
-        // Resetovanie hlasovacieho systému a sedenia pre novú session
         hlasovaciSystem.resetujHlasovanie();
         navrhyNaAgende.clear();
     }
