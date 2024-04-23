@@ -16,7 +16,7 @@ public class Vysledok {
     private boolean vyhodnot() {
         // Schvaľuje návrh, ak počet hlasov "za" je viac ako 50% zo všetkých platných hlasov
         int celkovyPocet = pocetZa + pocetProti + pocetZdrzaloSa;
-        return celkovyPocet > 0 && pocetZa > (celkovyPocet / 2);
+        return celkovyPocet > 0 && pocetZa > ((pocetZa + pocetProti) / 2);
     }
 
     public int getPocetZa() {

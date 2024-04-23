@@ -43,6 +43,14 @@ public class HlasovaciSystem {
         generujNahodneHlasy();
     }
 
+    public synchronized void ukonciHlasovanie() {
+        if (!hlasovanieBezi) {
+            throw new IllegalStateException("Hlasovanie nebolo zahájené.");
+        }
+        hlasovanieBezi = false;
+    }
+
+
     private void generujNahodneHlasy() {
         for (Navrh navrh : navrhyNaAgende) {
             Vysledok vysledok = vygenerujVysledky(this.pocetHlasujucich - 1);  // Odpočítanie 1 pre hlas správcu
@@ -60,12 +68,13 @@ public class HlasovaciSystem {
         }
         return new Vysledok(pocetZa, pocetProti, pocetZdrzaloSa);
     }
-
-    public synchronized void ukonciHlasovanie() {
-        if (!hlasovanieBezi) {
-            throw new IllegalStateException("Hlasovanie nebolo zahájené.");
+    public boolean evaluateLaw(String lawName) {
+        Vysledok vysledok = vysledkyHlasovania.get(lawName);
+        if (vysledok == null) {
+            throw new IllegalStateException("Hlasovanie pre tento zákon nebolo zahájené.");
         }
-        hlasovanieBezi = false;
+        int totalVotes = vysledok.getPocetZa() + vysledok.getPocetProti() + vysledok.getPocetZdrzaloSa();
+        return vysledok.getPocetZa() > totalVotes / 2;
     }
 
     public Map<String, Vysledok> getVysledkyHlasovania() {

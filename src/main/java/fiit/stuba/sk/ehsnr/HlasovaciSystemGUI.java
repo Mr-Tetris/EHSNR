@@ -34,7 +34,10 @@ public class HlasovaciSystemGUI extends Application {
         Button btnZahaj = new Button("Zahájiť hlasovanie");
         btnZahaj.setOnAction(e -> handleStartVoting(primaryStage));
         Button btnUkoncit = new Button("Ukončiť hlasovanie");
-        btnUkoncit.setOnAction(e -> controller.finalizeVoting(primaryStage));
+        btnUkoncit.setOnAction(e -> {
+            Label resultLabel = new Label();  // Toto by malo byť inde, ak chceme zobrazovať výsledky v dialógu
+            controller.finalizeVoting(primaryStage, txtNazovZakona.getText(), resultLabel);
+        });
 
         layout.getChildren().addAll(
                 new Label("Názov zákona:"), txtNazovZakona,
@@ -61,3 +64,4 @@ public class HlasovaciSystemGUI extends Application {
         launch(args);
     }
 }
+

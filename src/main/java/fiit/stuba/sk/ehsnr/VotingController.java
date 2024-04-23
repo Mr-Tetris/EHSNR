@@ -1,7 +1,10 @@
 package fiit.stuba.sk.ehsnr;
 
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
+
 import java.util.Arrays;
+import java.util.Map;
 
 public class VotingController {
     private HlasovaciSystem hlasovaciSystem;
@@ -15,22 +18,27 @@ public class VotingController {
     public void initiateVoting(Stage stage, String lawName, String details, int voters, int timeLimit) {
         hlasovaciSystem.setPocetHlasujucich(voters);
         hlasovaciSystem.setCasovyLimit(timeLimit);
-
-        // Začíname hlasovanie s aktualizovaným zoznamom návrhov
         hlasovaciSystem.zacniHlasovanie(Arrays.asList(new ZakonNavrh(lawName, details)));
-
-        // Zobrazujeme hlasovací dialóg s dodanými časovým limitom a kontrolérom
         votingDialog.showVotingDialog(stage, lawName, details, timeLimit, this);
     }
 
-    public void finalizeVoting(Stage stage) {
+    public void finalizeVoting(Stage stage, String lawName, Label resultLabel) {
+        if (!hlasovaciSystem.isHlasovanieBezi()) {
+            resultLabel.setText("Hlasovanie nebolo zahájené alebo už bolo ukončené.");
+            return;
+        }
         hlasovaciSystem.ukonciHlasovanie();
-        // Získavame a zobrazujeme výsledky hlasovania
-        votingDialog.displayResults("Finalizácia hlasovania", hlasovaciSystem.getVysledkyHlasovania(), stage);
+        boolean lawPassed = hlasovaciSystem.evaluateLaw(lawName);
+        resultLabel.setText(lawPassed ? "Zákon bol schválený." : "Zákon nebol schválený.");
+        votingDialog.displayResults("Finalizácia hlasovania: " + lawName, hlasovaciSystem.getVysledkyHlasovania(), stage);
     }
 
-    public void recordVote(String voteType, String lawName) {
-        // Tu by sa mohla zaznamenať volba hlasu a možno dokonca aktualizovať model
+
+    public void recordVote(String voteType, String lawName, Label resultLabel) {
         System.out.println("Hlas typu '" + voteType + "' bol zaznamenaný pre zákon: " + lawName);
+        resultLabel.setText("Váš hlas: " + voteType);
     }
 }
+
+
+
