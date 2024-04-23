@@ -4,37 +4,48 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.List;
+import java.util.ArrayList;
 
 public class HlasovaciSystem {
-<<<<<<< HEAD
-    //Zapuzdrenie - privatne premenne
-    private Map<String, Vysledok> vysledkyHlasovania; // Mapa názvov návrhov na výsledky hlasovania
-=======
     private Map<String, Vysledok> vysledkyHlasovania;
->>>>>>> b58ae528e91d20cd1af008ad374f4ea85fd969ba
     private SystemoveNastavenia nastavenia;
     private boolean hlasovanieBezi;
     private Random random;
+    private List<Navrh> navrhyNaAgende;
+    private int pocetHlasujucich; // Premenná pre ukladanie počtu hlasujúcich
+    private int casovyLimit;     // Premenná pre ukladanie časového limitu hlasovania
 
     public HlasovaciSystem(SystemoveNastavenia nastavenia) {
         this.nastavenia = nastavenia;
         this.vysledkyHlasovania = new HashMap<>();
         this.hlasovanieBezi = false;
         this.random = new Random();
+        this.navrhyNaAgende = new ArrayList<>();
+        this.pocetHlasujucich = 0;  // inicializácia na 0
+        this.casovyLimit = 0;       // inicializácia na 0
     }
 
-    public synchronized void zacniHlasovanie(List<Navrh> navrhyNaAgende) throws IllegalStateException {
+    // Settery pre počet hlasujúcich a časový limit
+    public void setPocetHlasujucich(int pocet) {
+        this.pocetHlasujucich = pocet;
+    }
+
+    public void setCasovyLimit(int limit) {
+        this.casovyLimit = limit;
+    }
+
+    public synchronized void zacniHlasovanie(List<Navrh> navrhy) {
         if (hlasovanieBezi) {
             throw new IllegalStateException("Hlasovanie už bolo zahájené.");
         }
+        this.navrhyNaAgende = navrhy;
         hlasovanieBezi = true;
-        generujNahodneHlasy(navrhyNaAgende);
+        generujNahodneHlasy();
     }
 
-    private void generujNahodneHlasy(List<Navrh> navrhyNaAgende) {
+    private void generujNahodneHlasy() {
         for (Navrh navrh : navrhyNaAgende) {
-            int pocetHlasujucich = nastavenia.getPocetHlasujucich() - 1; // -1 pre hlas správcu
-            Vysledok vysledok = vygenerujVysledky(pocetHlasujucich);
+            Vysledok vysledok = vygenerujVysledky(this.pocetHlasujucich - 1);  // Odpočítanie 1 pre hlas správcu
             vysledkyHlasovania.put(navrh.getNazov(), vysledok);
         }
     }
@@ -50,14 +61,14 @@ public class HlasovaciSystem {
         return new Vysledok(pocetZa, pocetProti, pocetZdrzaloSa);
     }
 
-    public synchronized void ukonciHlasovanie() throws IllegalStateException {
+    public synchronized void ukonciHlasovanie() {
         if (!hlasovanieBezi) {
             throw new IllegalStateException("Hlasovanie nebolo zahájené.");
         }
         hlasovanieBezi = false;
     }
 
-    public synchronized Map<String, Vysledok> getVysledkyHlasovania() {
+    public Map<String, Vysledok> getVysledkyHlasovania() {
         return new HashMap<>(vysledkyHlasovania);
     }
 
@@ -67,5 +78,6 @@ public class HlasovaciSystem {
 
     public void resetujHlasovanie() {
         vysledkyHlasovania.clear();
+        hlasovanieBezi = false;
     }
 }
