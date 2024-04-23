@@ -13,6 +13,21 @@ public class Vysledok {
         this.schvaleny = vyhodnot();
     }
 
+    public void pripocitajZa() {
+        pocetZa++;
+        this.schvaleny = vyhodnot();  // Re-evaluácia stavu schválenia
+    }
+
+    public void pripocitajProti() {
+        pocetProti++;
+        this.schvaleny = vyhodnot();
+    }
+
+    public void pripocitajZdrzaloSa() {
+        pocetZdrzaloSa++;
+        this.schvaleny = vyhodnot();
+    }
+
     private boolean vyhodnot() {
         // Schvaľuje návrh, ak počet hlasov "za" je viac ako 50% zo všetkých platných hlasov
         int celkovyPocet = pocetZa + pocetProti + pocetZdrzaloSa;

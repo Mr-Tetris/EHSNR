@@ -76,6 +76,20 @@ public class HlasovaciSystem {
         int totalVotes = vysledok.getPocetZa() + vysledok.getPocetProti() + vysledok.getPocetZdrzaloSa();
         return vysledok.getPocetZa() > totalVotes / 2;
     }
+    public void pripocitajHlas(String lawName, String voteType) {
+        Vysledok vysledok = vysledkyHlasovania.get(lawName);
+        if (vysledok == null) {
+            throw new IllegalStateException("Hlasovanie pre tento zákon ešte nebolo zahájené.");
+        }
+        if ("za".equals(voteType)) {
+            vysledok.pripocitajZa();
+        } else if ("proti".equals(voteType)) {
+            vysledok.pripocitajProti();
+        } else if ("abstain".equals(voteType)) {
+            vysledok.pripocitajZdrzaloSa();
+        }
+    }
+
 
     public Map<String, Vysledok> getVysledkyHlasovania() {
         return new HashMap<>(vysledkyHlasovania);

@@ -36,8 +36,10 @@ public class VotingController {
 
     public void recordVote(String voteType, String lawName, Label resultLabel) {
         System.out.println("Hlas typu '" + voteType + "' bol zaznamenaný pre zákon: " + lawName);
+        hlasovaciSystem.pripocitajHlas(lawName, voteType);  // Pridanie hlasu do systému
         resultLabel.setText("Váš hlas: " + voteType);
     }
+
 }
 
 

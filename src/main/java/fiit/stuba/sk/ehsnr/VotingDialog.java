@@ -13,11 +13,12 @@ public class VotingDialog {
     private AnimationTimer timer;
 
     public void showVotingDialog(Stage stage, String title, String info, int timeLimit, VotingController controller) {
-        VBox layout = new VBox(10);
+        VBox layout = new VBox(15);  // Zväčšenie vertikálneho odstupu
         layout.setAlignment(Pos.CENTER);
 
         TextArea infoArea = new TextArea(info);
         infoArea.setEditable(false);
+        infoArea.setWrapText(true);  // Zapnutie zalamovania textu
 
         Label timerLabel = new Label("Zostávajúci čas: " + timeLimit + " sekúnd");
         Label voteResultLabel = new Label("");  // Label pre výsledok hlasovania
@@ -38,9 +39,16 @@ public class VotingDialog {
             controller.recordVote("abstain", title, voteResultLabel);
         });
 
-        layout.getChildren().addAll(new Label("Informácie o zákone:"), infoArea, timerLabel, btnVoteYes, btnVoteNo, btnAbstain, voteResultLabel);
+        layout.getChildren().addAll(
+                new Label("Informácie o zákone:"), infoArea,
+                timerLabel,
+                new Separator(),  // Pridanie separátora pre lepšie vizuálne oddelenie
+                btnVoteYes, btnVoteNo, btnAbstain,
+                new Separator(),  // Ďalší separátor pred výsledkom hlasovania
+                voteResultLabel
+        );
 
-        Scene scene = new Scene(layout, 400, 400);
+        Scene scene = new Scene(layout, 400, 500);  // Zväčšenie výšky okna
         stage.setTitle("Hlasovanie o zákone: " + title);
         stage.setScene(scene);
         stage.show();
@@ -65,20 +73,34 @@ public class VotingDialog {
         timer.start();
     }
     public void displayResults(String title, Map<String, Vysledok> results, Stage stage) {
-        VBox layout = new VBox(10);
+        VBox layout = new VBox(10);  // Upravený vertikálny rozostup
         layout.setAlignment(Pos.CENTER);
+
         results.forEach((law, result) -> {
+            // Vytvorenie kontajnera pre jednotlivé zákony
+            VBox lawLayout = new VBox(5);
+            lawLayout.setAlignment(Pos.CENTER);
+
             String status = result.isSchvaleny() ? "Schválený" : "Neschválený";
-            layout.getChildren().add(new Label(law + " výsledky: Za - " + result.getPocetZa() +
-                    ", Proti - " + result.getPocetProti() + ", Zdržalo sa - " + result.getPocetZdrzaloSa() +
-                    ". Stav: " + status));
+            Label lawLabel = new Label(law + " výsledky:");
+            Label resultsLabel = new Label("Za - " + result.getPocetZa() +
+                    ", Proti - " + result.getPocetProti() + ", Zdržalo sa - " + result.getPocetZdrzaloSa());
+            Label statusLabel = new Label("Stav: " + status);
+
+            // Pridanie prvkov do kontajnera pre zákon
+            lawLayout.getChildren().addAll(lawLabel, resultsLabel, statusLabel);
+
+            // Pridanie kontajnera do hlavného layoutu
+            layout.getChildren().add(lawLayout);
+            layout.getChildren().add(new Separator());  // Separátor medzi zákonmi
         });
 
-        Scene scene = new Scene(layout, 300, 300);
+        Scene scene = new Scene(layout, 400, 600);  // Upravené rozmery okna podľa potreby
         stage.setTitle(title);
         stage.setScene(scene);
         stage.show();
     }
+
 
 
 }
