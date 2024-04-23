@@ -4,19 +4,18 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+<<<<<<< HEAD
         Scanner scanner = new Scanner(System.in);
+=======
+>>>>>>> b58ae528e91d20cd1af008ad374f4ea85fd969ba
         SystemoveNastavenia nastavenia = new SystemoveNastavenia();
         HlasovaciSystem hlasovaciSystem = new HlasovaciSystem(nastavenia);
-        Sedenie sedenie = new Sedenie(hlasovaciSystem, scanner);
+        Sedenie sedenie = new Sedenie(hlasovaciSystem, nastavenia);
 
-        while (true) {
-            System.out.println("\nVitajte v Elektronickom Hlasovacom Systéme Národnej Rady!");
-            System.out.println("1. Nastaviť hlasovanie");
-            System.out.println("2. Spustiť hlasovanie");
-            System.out.println("3. Ukončiť");
-            System.out.print("Zadajte voľbu: ");
-            String volba = scanner.nextLine();
+        launchGUI(nastavenia, sedenie);
+    }
 
+<<<<<<< HEAD
             switch (volba) {
                 case "1":
                     System.out.print("Zadajte počet hlasujúcich (10 - 200): ");
@@ -103,6 +102,11 @@ public class Main {
                     break;
             }
         }
+=======
+    private static void launchGUI(SystemoveNastavenia nastavenia, Sedenie sedenie) {
+        // Táto metóda by spustila GUI aplikáciu, ktorá by mala metódy na nastavenie a spustenie hlasovania
+        // Tento kód predpokladá, že existuje GUI trieda, ktorá riadi logiku GUI a môže vyzerať napríklad takto:
+        javafx.application.Application.launch(HlasovaciSystemGUI.class);
+>>>>>>> b58ae528e91d20cd1af008ad374f4ea85fd969ba
     }
 }
-

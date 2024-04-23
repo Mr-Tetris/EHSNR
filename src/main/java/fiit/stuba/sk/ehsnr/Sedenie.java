@@ -2,24 +2,33 @@ package fiit.stuba.sk.ehsnr;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Sedenie {
+<<<<<<< HEAD
     // Agregácia - obsahuje referenciu na triedu HlasovaciSystem
     private List<Navrh> navrhyNaAgende;
+=======
+>>>>>>> b58ae528e91d20cd1af008ad374f4ea85fd969ba
     private HlasovaciSystem hlasovaciSystem;
-    private Scanner scanner;
+    private SystemoveNastavenia nastavenia;
 
-    public Sedenie(HlasovaciSystem hlasovaciSystem, Scanner scanner) {
-        this.navrhyNaAgende = new ArrayList<>();
+    public Sedenie(HlasovaciSystem hlasovaciSystem, SystemoveNastavenia nastavenia) {
         this.hlasovaciSystem = hlasovaciSystem;
+<<<<<<< HEAD
         this.scanner = scanner;
+=======
+        this.nastavenia = nastavenia;
+>>>>>>> b58ae528e91d20cd1af008ad374f4ea85fd969ba
     }
 
-    public void pridajNavrhNaAgendu(Navrh navrh) {
-        navrhyNaAgende.add(navrh);
-    }
+    public void zahajSedenie(String nazovZakona, String informacie, int pocetHlasujucich, int casovyLimit) {
+        // Nastaví parametre hlasovania pred jeho začatím
+        nastavenia.setPocetHlasujucich(pocetHlasujucich);
+        nastavenia.setNazovZakona(nazovZakona);
+        nastavenia.setInformacieZakona(informacie);
+        nastavenia.setCasovyLimit(casovyLimit);
 
+<<<<<<< HEAD
     public void zahajSedenie() {
         System.out.println("Zahajuje sa hlasovacie sedenie s nasledujúcimi návrhmi:");
         for (Navrh navrh : navrhyNaAgende) {
@@ -30,10 +39,23 @@ public class Sedenie {
         } else {
             System.out.println("Nie sú žiadne návrhy na agende.");
         }
+=======
+        // Vytvorenie návrhu zákona a pridanie do zoznamu na hlasovanie
+        ZakonNavrh navrh = new ZakonNavrh(nazovZakona, informacie);  // Používame konkrétnu triedu
+        List<Navrh> navrhyNaHlasovanie = new ArrayList<>();
+        navrhyNaHlasovanie.add(navrh);
+
+        // Spustenie hlasovania s danými návrhmi
+        hlasovaciSystem.zacniHlasovanie(navrhyNaHlasovanie);
+
+        System.out.println("Hlasovanie o zakone '" + nazovZakona + "' začína s počtom hlasujúcich " + pocetHlasujucich + " a limitom " + casovyLimit + " sekúnd.");
+>>>>>>> b58ae528e91d20cd1af008ad374f4ea85fd969ba
     }
 
     public void ukonciSedenie() {
+        // Ukončenie hlasovania a vyhodnotenie výsledkov
         hlasovaciSystem.ukonciHlasovanie();
+<<<<<<< HEAD
 
         for (Navrh navrh : navrhyNaAgende) {
             Vysledok vysledok = hlasovaciSystem.getVysledkyHlasovania().get(navrh.getNazov());
@@ -57,8 +79,9 @@ public class Sedenie {
 
     public List<Navrh> getNavrhyNaAgende() {
         return new ArrayList<>(navrhyNaAgende);
+=======
+        System.out.println("Hlasovanie bolo ukončené.");
+        // vypisVysledky();  // Implementujte podľa potreby
+>>>>>>> b58ae528e91d20cd1af008ad374f4ea85fd969ba
     }
 }
-
-
-

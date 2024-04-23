@@ -5,10 +5,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.List;
 
-
 public class HlasovaciSystem {
+<<<<<<< HEAD
     //Zapuzdrenie - privatne premenne
     private Map<String, Vysledok> vysledkyHlasovania; // Mapa názvov návrhov na výsledky hlasovania
+=======
+    private Map<String, Vysledok> vysledkyHlasovania;
+>>>>>>> b58ae528e91d20cd1af008ad374f4ea85fd969ba
     private SystemoveNastavenia nastavenia;
     private boolean hlasovanieBezi;
     private Random random;
@@ -20,7 +23,7 @@ public class HlasovaciSystem {
         this.random = new Random();
     }
 
-    public synchronized void zacniHlasovanie(List<Navrh> navrhyNaAgende) {
+    public synchronized void zacniHlasovanie(List<Navrh> navrhyNaAgende) throws IllegalStateException {
         if (hlasovanieBezi) {
             throw new IllegalStateException("Hlasovanie už bolo zahájené.");
         }
@@ -30,24 +33,24 @@ public class HlasovaciSystem {
 
     private void generujNahodneHlasy(List<Navrh> navrhyNaAgende) {
         for (Navrh navrh : navrhyNaAgende) {
-            int pocetZa = 0;
-            int pocetProti = 0;
-            int pocetZdrzaloSa = 0;
             int pocetHlasujucich = nastavenia.getPocetHlasujucich() - 1; // -1 pre hlas správcu
-
-            for (int i = 0; i < pocetHlasujucich; i++) {
-                int hlas = random.nextInt(3);
-                if (hlas == 0) pocetZa++;
-                else if (hlas == 1) pocetProti++;
-                else pocetZdrzaloSa++;
-            }
-
-            Vysledok vysledok = new Vysledok(pocetZa, pocetProti, pocetZdrzaloSa);
+            Vysledok vysledok = vygenerujVysledky(pocetHlasujucich);
             vysledkyHlasovania.put(navrh.getNazov(), vysledok);
         }
     }
 
-    public synchronized void ukonciHlasovanie() {
+    private Vysledok vygenerujVysledky(int pocetHlasujucich) {
+        int pocetZa = 0, pocetProti = 0, pocetZdrzaloSa = 0;
+        for (int i = 0; i < pocetHlasujucich; i++) {
+            int hlas = random.nextInt(3);
+            if (hlas == 0) pocetZa++;
+            else if (hlas == 1) pocetProti++;
+            else pocetZdrzaloSa++;
+        }
+        return new Vysledok(pocetZa, pocetProti, pocetZdrzaloSa);
+    }
+
+    public synchronized void ukonciHlasovanie() throws IllegalStateException {
         if (!hlasovanieBezi) {
             throw new IllegalStateException("Hlasovanie nebolo zahájené.");
         }
@@ -63,9 +66,6 @@ public class HlasovaciSystem {
     }
 
     public void resetujHlasovanie() {
+        vysledkyHlasovania.clear();
     }
 }
-
-
-
-
