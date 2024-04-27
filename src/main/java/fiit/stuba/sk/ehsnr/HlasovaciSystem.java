@@ -34,21 +34,28 @@ public class HlasovaciSystem {
         this.casovyLimit = limit;
     }
 
-    public synchronized void zacniHlasovanie(List<Navrh> navrhy) {
+    public synchronized void zacniHlasovanie(Navrh navrh) {
         if (hlasovanieBezi) {
             throw new IllegalStateException("Hlasovanie už bolo zahájené.");
         }
-        this.navrhyNaAgende = navrhy;
-        hlasovanieBezi = true;
-        generujNahodneHlasy();
+        this.navrhyNaAgende.clear();  // Vyčistenie starých návrhov
+        this.navrhyNaAgende.add(navrh);  // Pridanie aktuálneho návrhu na hlasovanie
+        this.hlasovanieBezi = true;
     }
 
-    public synchronized void ukonciHlasovanie() {
-        if (!hlasovanieBezi) {
-            throw new IllegalStateException("Hlasovanie nebolo zahájené.");
+
+    public void ukonciHlasovanie(String lawName) {
+        Vysledok vysledok = vysledkyHlasovania.get(lawName);
+        if (vysledok == null) {
+            throw new IllegalStateException("Hlasovanie pre tento zákon ešte nebolo zahájené.");
         }
-        hlasovanieBezi = false;
+        System.out.println("Výsledky hlasovania pre zákon " + lawName + ":");
+        System.out.println("Za: " + vysledok.getPocetZa());
+        System.out.println("Proti: " + vysledok.getPocetProti());
+        System.out.println("Zdržalo sa: " + vysledok.getPocetZdrzaloSa());
+        System.out.println("Schválený: " + vysledok.isSchvaleny());
     }
+
 
 
     private void generujNahodneHlasy() {
@@ -79,17 +86,59 @@ public class HlasovaciSystem {
     public void pripocitajHlas(String lawName, String voteType) {
         Vysledok vysledok = vysledkyHlasovania.get(lawName);
         if (vysledok == null) {
-            throw new IllegalStateException("Hlasovanie pre tento zákon ešte nebolo zahájené.");
+            vysledok = new Vysledok(0, 0, 0);
+            vysledkyHlasovania.put(lawName, vysledok);
         }
-        if ("za".equals(voteType)) {
-            vysledok.pripocitajZa();
-        } else if ("proti".equals(voteType)) {
-            vysledok.pripocitajProti();
-        } else if ("abstain".equals(voteType)) {
-            vysledok.pripocitajZdrzaloSa();
+
+        switch (voteType) {
+            case "za":
+                vysledok.pripocitajZa();
+                break;
+            case "proti":
+                vysledok.pripocitajProti();
+                break;
+            case "abstain":
+                vysledok.pripocitajZdrzaloSa();
+                break;
         }
     }
 
+
+    private void generujZvysokHlasov(String lawName) {
+        Vysledok vysledok = vysledkyHlasovania.get(lawName);
+        int zostavajuciHlasy = pocetHlasujucich - 1;  // Odpočítaj prvý hlas
+
+        for (int i = 0; i < zostavajuciHlasy; i++) {
+            int hlas = random.nextInt(3);
+            if (hlas == 0) vysledok.pripocitajZa();
+            else if (hlas == 1) vysledok.pripocitajProti();
+            else vysledok.pripocitajZdrzaloSa();
+        }
+    }
+    public void hlasujZa(String lawName) {
+        Vysledok vysledok = vysledkyHlasovania.getOrDefault(lawName, new Vysledok(0, 0, 0));
+        vysledok.pripocitajZa();
+        vysledkyHlasovania.put(lawName, vysledok); // Uistite sa, že zmeny sú uložené
+    }
+
+    public void hlasujProti(String lawName) {
+        Vysledok vysledok = vysledkyHlasovania.getOrDefault(lawName, new Vysledok(0, 0, 0));
+        vysledok.pripocitajProti();
+        vysledkyHlasovania.put(lawName, vysledok);
+    }
+
+    public void hlasujZdrzSa(String lawName) {
+        Vysledok vysledok = vysledkyHlasovania.getOrDefault(lawName, new Vysledok(0, 0, 0));
+        vysledok.pripocitajZdrzaloSa();
+        vysledkyHlasovania.put(lawName, vysledok);
+    }
+
+    public void pridajNavrh(Navrh navrh) {
+        this.navrhyNaAgende.add(navrh);
+    }
+    public List<Navrh> getNavrhyNaAgende(){
+        return new ArrayList<>(navrhyNaAgende);
+    }
 
     public Map<String, Vysledok> getVysledkyHlasovania() {
         return new HashMap<>(vysledkyHlasovania);

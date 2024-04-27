@@ -18,7 +18,7 @@ public class VotingController {
     public void initiateVoting(Stage stage, String lawName, String details, int voters, int timeLimit) {
         hlasovaciSystem.setPocetHlasujucich(voters);
         hlasovaciSystem.setCasovyLimit(timeLimit);
-        hlasovaciSystem.zacniHlasovanie(Arrays.asList(new ZakonNavrh(lawName, details)));
+        hlasovaciSystem.zacniHlasovanie(new ZakonNavrh(lawName, details));
         votingDialog.showVotingDialog(stage, lawName, details, timeLimit, this);
     }
 
@@ -27,7 +27,7 @@ public class VotingController {
             resultLabel.setText("Hlasovanie nebolo zahájené alebo už bolo ukončené.");
             return;
         }
-        hlasovaciSystem.ukonciHlasovanie();
+        hlasovaciSystem.ukonciHlasovanie(lawName);
         boolean lawPassed = hlasovaciSystem.evaluateLaw(lawName);
         resultLabel.setText(lawPassed ? "Zákon bol schválený." : "Zákon nebol schválený.");
         votingDialog.displayResults("Finalizácia hlasovania: " + lawName, hlasovaciSystem.getVysledkyHlasovania(), stage);

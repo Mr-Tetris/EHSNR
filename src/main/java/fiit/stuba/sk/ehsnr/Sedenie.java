@@ -1,7 +1,7 @@
 package fiit.stuba.sk.ehsnr;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Sedenie {
     private HlasovaciSystem hlasovaciSystem;
@@ -11,29 +11,22 @@ public class Sedenie {
         this.hlasovaciSystem = hlasovaciSystem;
         this.nastavenia = nastavenia;
     }
-
-    public void zahajSedenie(String nazovZakona, String informacie, int pocetHlasujucich, int casovyLimit) {
-        // Nastaví parametre hlasovania pred jeho začatím
-        nastavenia.setPocetHlasujucich(pocetHlasujucich);
-        nastavenia.setNazovZakona(nazovZakona);
-        nastavenia.setInformacieZakona(informacie);
-        nastavenia.setCasovyLimit(casovyLimit);
-
-        // Vytvorenie návrhu zákona a pridanie do zoznamu na hlasovanie
-        ZakonNavrh navrh = new ZakonNavrh(nazovZakona, informacie);  // Používame konkrétnu triedu
-        List<Navrh> navrhyNaHlasovanie = new ArrayList<>();
-        navrhyNaHlasovanie.add(navrh);
-
-        // Spustenie hlasovania s danými návrhmi
-        hlasovaciSystem.zacniHlasovanie(navrhyNaHlasovanie);
-
-        System.out.println("Hlasovanie o zakone '" + nazovZakona + "' začína s počtom hlasujúcich " + pocetHlasujucich + " a limitom " + casovyLimit + " sekúnd.");
+    public List<Navrh> getNavrhyNaAgende() {
+        return hlasovaciSystem.getNavrhyNaAgende();
     }
 
-    public void ukonciSedenie() {
-        // Ukončenie hlasovania a vyhodnotenie výsledkov
-        hlasovaciSystem.ukonciHlasovanie();
-        System.out.println("Hlasovanie bolo ukončené.");
-        // vypisVysledky();  // Implementujte podľa potreby
+
+    public void pridajNavrhNaAgendu(Navrh navrh) {
+        hlasovaciSystem.pridajNavrh(navrh);  // Asumujeme, že hlasovací systém môže spravovať svoje návrhy
+    }
+
+    public void zahajSedenie(Navrh vybranyNavrh) {
+        hlasovaciSystem.zacniHlasovanie(vybranyNavrh);  // Prenesú sa všetky potrebné informácie
+        System.out.println("Hlasovanie o zakone '" + vybranyNavrh.getNazov() + "' začína.");
+    }
+
+    public void ukonciSedenie(String lawName) {
+        hlasovaciSystem.ukonciHlasovanie(lawName);  // Prenos názvu zákona alebo identifikátora
+        System.out.println("Hlasovanie pre zákon '" + lawName + "' bolo ukončené.");
     }
 }

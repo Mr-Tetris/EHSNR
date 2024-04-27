@@ -1,6 +1,5 @@
 package fiit.stuba.sk.ehsnr;
 
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
