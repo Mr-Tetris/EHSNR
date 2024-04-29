@@ -97,25 +97,6 @@ public class HlasovaciSystemGUI extends Application {
         });
     }
 
-    private void handleStartVoting(Stage primaryStage) {
-        List<Navrh> navrhy = controller.getNavrhyNaAgendu();
-        if (navrhy.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Nie sú k dispozícii žiadne návrhy na hlasovanie.");
-            alert.showAndWait();
-            return;
-        }
-
-        ChoiceDialog<Navrh> dialog = new ChoiceDialog<>(navrhy.get(0), navrhy);
-        dialog.setTitle("Vyberte Návrh na Hlasovanie");
-        dialog.setHeaderText("Vyberte návrh na hlasovanie:");
-        dialog.setContentText("Dostupné návrhy:");
-
-        Optional<Navrh> result = dialog.showAndWait();
-        result.ifPresent(navrh -> {
-            controller.zacniHlasovanie(navrh);
-        });
-    }
-
     private void handleAddProposal() {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Pridanie Návrhu");
@@ -182,16 +163,8 @@ public class HlasovaciSystemGUI extends Application {
                     Platform.runLater(() -> {
                         casLabel.setText("Čas na hlasovanie vypršal");
                         disableVotingButtons(btnVoteFor, btnVoteAgainst, btnAbstain);
-
-                        // Finalizácia hlasovania a spracovanie výsledkov
-                        controller.finalizeVoting(vybranyNavrh.getNazov(), resultLabel, (Boolean passed, Vysledok vysledok) -> {
-                            Platform.runLater(() -> {
-                                // Zobrazenie výsledkov na novom okne
-                                showResultsWindow(vybranyNavrh.getNazov(), passed, vysledok, new Stage());
-                                // Aktualizácia informačného štítku na aktuálnej obrazovke
-                                resultLabel.setText(passed ? "Zákon bol schválený." : "Zákon nebol schválený.");
-                            });
-                        });
+                        // Zavoláme finalizeVoting na controlleri, ktorý už sa postará o zvyšok logiky
+                        controller.finalizeVoting(vybranyNavrh.getNazov(), resultLabel);
                     });
                 }
             });
@@ -279,45 +252,38 @@ public class HlasovaciSystemGUI extends Application {
 
         layout.getChildren().addAll(finalResultLabel, zaLabel, protiLabel, zdrzalSaLabel);
 
+        Button continueVotingButton = new Button("Pokračovať v ďalšom hlasovaní");
+        Button createNewProposalButton = new Button("Vytvoriť nový návrh");
+        Button exitButton = new Button("Ukončiť");
+
+        // Akcia pre pokračovanie v hlasovaní
+        continueVotingButton.setOnAction(e -> {
+            resultsStage.close();
+            showVotingOptions(new Stage());
+        });
+
+        // Akcia pre vytvorenie nového návrhu
+        createNewProposalButton.setOnAction(e -> {
+            resultsStage.close();
+        });
+
+        // Akcia pre ukončenie aplikácie
+        exitButton.setOnAction(e -> {
+            Platform.exit();
+        });
+
+        // Skontrolujeme, či sú ešte nejaké návrhy na hlasovanie
+        continueVotingButton.setDisable(controller.getNavrhyNaAgendu().isEmpty());
+
+        // Pridanie tlačítok do layoutu
+        layout.getChildren().addAll(continueVotingButton, createNewProposalButton, exitButton);
+
         Scene scene = new Scene(layout, 350, 250);
         resultsStage.setTitle("Výsledky hlasovania o zákone: " + lawName);
         resultsStage.setScene(scene);
         resultsStage.show();
     }
 
-
-    public void finalizeVoting(String lawName, Label resultLabel) {
-        votingController.finalizeVoting(lawName, resultLabel, (Boolean passed, Vysledok vysledok) -> {
-            Stage resultsStage = new Stage();
-            VBox layout = new VBox(10);
-            layout.setAlignment(Pos.CENTER);
-
-            String resultText = passed ? "Zákon bol schválený." : "Zákon nebol schválený.";
-            Label finalResultLabel = new Label(resultText);
-            Label zaLabel = new Label("Počet hlasov ZA: " + vysledok.getPocetZa());
-            Label protiLabel = new Label("Počet hlasov PROTI: " + vysledok.getPocetProti());
-            Label zdrzalSaLabel = new Label("Počet zdržalo sa: " + vysledok.getPocetZdrzaloSa());
-
-            Button newProposalButton = new Button("Vytvoriť nový návrh");
-            newProposalButton.setOnAction(e -> handleAddProposal());
-
-            Button voteNextProposalButton = new Button("Hlasovať za ďalší návrh");
-            voteNextProposalButton.setOnAction(e -> showVotingOptions(resultsStage));  // Assume this method refreshes the voting options
-
-            Button exitButton = new Button("Ukončiť program");
-            exitButton.setOnAction(e -> System.exit(0));
-
-            layout.getChildren().addAll(finalResultLabel, zaLabel, protiLabel, zdrzalSaLabel, newProposalButton, voteNextProposalButton, exitButton);
-
-            Scene scene = new Scene(layout, 350, 250);
-            resultsStage.setTitle("Výsledky hlasovania");
-            resultsStage.setScene(scene);
-            resultsStage.show();
-
-            // Update resultLabel for the previous screen if needed
-            resultLabel.setText(resultText);
-        });
-    }
 
 
 

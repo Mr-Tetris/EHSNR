@@ -34,9 +34,7 @@ public class HlasovaciSystemController {
         sedenie.zahajSedenie(navrh);
     }
 
-    public void ukonciSedenie(String lawName) {
-        hlasovaciSystem.ukonciHlasovanie(lawName);
-    }
+
 
     // Metóda pre hlasovanie "ZA"
     public void voteFor(Navrh navrh, Label resultLabel, TimerService timerService) {
@@ -58,14 +56,23 @@ public class HlasovaciSystemController {
     public void abstain(Navrh navrh, Label resultLabel, TimerService timerService) {
         if (hlasovaciSystem.isHlasovanieBezi()) {
             hlasovaciSystem.pripocitajHlas(navrh.getNazov(), "abstain");
-            resultLabel.setText("Hlasovali ste: ZDRŽALI STE SA");
+            resultLabel.setText("Zdržali ste sa hlasovania");
             timerService.continueTimer(); // pokračuje v časovači
         }
     }
 
 
-    public void finalizeVoting(String lawName, Label resultLabel, BiConsumer<Boolean, Vysledok> resultHandler) {
-        votingController.finalizeVoting(lawName, resultLabel, resultHandler);
+    public void finalizeVoting(String nazov, Label resultLabel) {
+        votingController.finalizeVoting(nazov, resultLabel, (Boolean passed, Vysledok vysledok) -> {
+            Platform.runLater(() -> {
+                if (passed) {
+                    resultLabel.setText("Zákon bol schválený.");
+                } else {
+                    resultLabel.setText("Zákon nebol schválený.");
+                }
+                // Tu už nie je potrebné volanie showResultsWindow, predpokladáme, že sa zobrazuje v finalizeVoting vo VotingController.
+            });
+        });
     }
 
 

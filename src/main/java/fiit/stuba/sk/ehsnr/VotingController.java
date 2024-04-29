@@ -29,14 +29,22 @@ public class VotingController {
             Platform.runLater(() -> resultLabel.setText("Hlasovanie nebolo zahájené alebo už bolo ukončené."));
             return;
         }
+
+        // Generovanie zostávajúcich hlasov
+        hlasovaciSystem.generujZvysokHlasov(lawName); // Táto metóda musí byť implementovaná v HlasovaciSystem
+
+        // Ukončenie hlasovania
         hlasovaciSystem.ukonciHlasovanie(lawName);
+        hlasovaciSystem.odstranNavrh(lawName);
         boolean lawPassed = hlasovaciSystem.evaluateLaw(lawName);
         Vysledok vysledok = hlasovaciSystem.getVysledkyHlasovania().get(lawName);
+
         Platform.runLater(() -> {
             resultHandler.accept(lawPassed, vysledok);
             gui.showResultsWindow(lawName, lawPassed, vysledok, new Stage());
         });
     }
+
 
     public void recordVote(String voteType, String lawName, Label resultLabel) {
         hlasovaciSystem.pripocitajHlas(lawName, voteType);

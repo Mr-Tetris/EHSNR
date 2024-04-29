@@ -51,19 +51,41 @@ public class HlasovaciSystem {
         if (vysledok == null) {
             throw new IllegalStateException("Hlasovanie pre tento zákon ešte nebolo zahájené.");
         }
+
+        // Generovanie náhodných hlasov
+        generujZvysokHlasov(lawName);
+
+        // Aktualizácia stavu hlasovania
         this.hlasovanieBezi = false;
         System.out.println("Hlasovanie o zákone '" + lawName + "' bolo ukončené.");
+
     }
+    public void generujZvysokHlasov(String lawName) {
+        Vysledok vysledok = vysledkyHlasovania.get(lawName);
+        int pocetAktualnychHlasov = vysledok.getPocetZa() + vysledok.getPocetProti() + vysledok.getPocetZdrzaloSa();
+        // Získanie celkového počtu hlasujúcich z nastavení
+        int celkovyPocetHlasujucich = nastavenia.getPocetHlasujucich();
+        int zostavajuciHlasy = celkovyPocetHlasujucich - pocetAktualnychHlasov;
 
-
-
-
-    private void generujNahodneHlasy() {
-        for (Navrh navrh : navrhyNaAgende) {
-            Vysledok vysledok = vygenerujVysledky(this.pocetHlasujucich - 1);  // Odpočítanie 1 pre hlas správcu
-            vysledkyHlasovania.put(navrh.getNazov(), vysledok);
+        Vysledok dodatocneHlasy = vygenerujVysledky(zostavajuciHlasy);
+        for (int i = 0; i < dodatocneHlasy.getPocetZa(); i++) {
+            vysledok.pripocitajZa();
         }
+        for (int i = 0; i < dodatocneHlasy.getPocetProti(); i++) {
+            vysledok.pripocitajProti();
+        }
+        for (int i = 0; i < dodatocneHlasy.getPocetZdrzaloSa(); i++) {
+            vysledok.pripocitajZdrzaloSa();
+        }
+
+        vysledkyHlasovania.put(lawName, vysledok);  // Uloženie updatovanej verzie výsledku
     }
+
+
+
+
+
+
 
     private Vysledok vygenerujVysledky(int pocetHlasujucich) {
         int pocetZa = 0, pocetProti = 0, pocetZdrzaloSa = 0;
@@ -80,7 +102,7 @@ public class HlasovaciSystem {
         if (vysledok == null) {
             throw new IllegalStateException("Hlasovanie pre tento zákon nebolo zahájené.");
         }
-        int totalVotes = vysledok.getPocetZa() + vysledok.getPocetProti() + vysledok.getPocetZdrzaloSa();
+        int totalVotes = vysledok.getPocetZa() + vysledok.getPocetProti();
         return vysledok.getPocetZa() > totalVotes / 2;
     }
     public void pripocitajHlas(String lawName, String voteType) {
@@ -102,36 +124,10 @@ public class HlasovaciSystem {
                 break;
         }
     }
-
-
-    private void generujZvysokHlasov(String lawName) {
-        Vysledok vysledok = vysledkyHlasovania.get(lawName);
-        int zostavajuciHlasy = pocetHlasujucich - 1;  // Odpočítaj prvý hlas
-
-        for (int i = 0; i < zostavajuciHlasy; i++) {
-            int hlas = random.nextInt(3);
-            if (hlas == 0) vysledok.pripocitajZa();
-            else if (hlas == 1) vysledok.pripocitajProti();
-            else vysledok.pripocitajZdrzaloSa();
-        }
-    }
-    public void hlasujZa(String lawName) {
-        Vysledok vysledok = vysledkyHlasovania.getOrDefault(lawName, new Vysledok(0, 0, 0));
-        vysledok.pripocitajZa();
-        vysledkyHlasovania.put(lawName, vysledok); // Uistite sa, že zmeny sú uložené
+    public void odstranNavrh(String lawName) {
+        navrhyNaAgende.removeIf(navrh -> navrh.getNazov().equals(lawName));
     }
 
-    public void hlasujProti(String lawName) {
-        Vysledok vysledok = vysledkyHlasovania.getOrDefault(lawName, new Vysledok(0, 0, 0));
-        vysledok.pripocitajProti();
-        vysledkyHlasovania.put(lawName, vysledok);
-    }
-
-    public void hlasujZdrzSa(String lawName) {
-        Vysledok vysledok = vysledkyHlasovania.getOrDefault(lawName, new Vysledok(0, 0, 0));
-        vysledok.pripocitajZdrzaloSa();
-        vysledkyHlasovania.put(lawName, vysledok);
-    }
 
     public void pridajNavrh(Navrh navrh) {
         this.navrhyNaAgende.add(navrh);
@@ -148,9 +144,4 @@ public class HlasovaciSystem {
         return hlasovanieBezi;
     }
 
-
-    public void resetujHlasovanie() {
-        vysledkyHlasovania.clear();
-        hlasovanieBezi = false;
-    }
 }
