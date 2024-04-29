@@ -1,15 +1,25 @@
 package fiit.stuba.sk.ehsnr;
 
+import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class HlasovaciSystemController {
     private Sedenie sedenie;
     private HlasovaciSystem hlasovaciSystem;
+    private HlasovaciSystemGUI gui;
+    private VotingController votingController;  // Pridanie inštancie VotingController
 
-    public HlasovaciSystemController(Sedenie sedenie) {
+    public HlasovaciSystemController(Sedenie sedenie, HlasovaciSystem hlasovaciSystem, HlasovaciSystemGUI gui, VotingController votingController) {
         this.sedenie = sedenie;
+        this.hlasovaciSystem = hlasovaciSystem;
+        this.gui = gui;
+        this.votingController = votingController;
     }
 
     public void pridajNavrh(Navrh navrh) {
@@ -52,5 +62,12 @@ public class HlasovaciSystemController {
             timerService.continueTimer(); // pokračuje v časovači
         }
     }
+
+
+    public void finalizeVoting(String lawName, Label resultLabel, BiConsumer<Boolean, Vysledok> resultHandler) {
+        votingController.finalizeVoting(lawName, resultLabel, resultHandler);
+    }
+
+
 }
 

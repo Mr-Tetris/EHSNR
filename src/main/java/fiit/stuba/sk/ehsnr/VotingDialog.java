@@ -1,5 +1,6 @@
 package fiit.stuba.sk.ehsnr;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -65,43 +66,35 @@ public class VotingDialog {
                     timerLabel.setText("Zostávajúci čas: " + remainingSeconds + " sekúnd");
                 } else {
                     timerLabel.setText("Hlasovanie skončilo");
-                    controller.finalizeVoting(stage, lawName, voteResultLabel);
                     this.stop();
+                    controller.finalizeVoting(lawName, voteResultLabel, (passed, vysledok) -> {
+                        Platform.runLater(() -> {
+                            displayResults(lawName, passed, vysledok, stage);
+                        });
+                    });
                 }
             }
         };
         timer.start();
     }
-    public void displayResults(String title, Map<String, Vysledok> results, Stage stage) {
-        VBox layout = new VBox(10);  // Upravený vertikálny rozostup
+
+    public void displayResults(String lawName, boolean passed, Vysledok vysledok, Stage stage) {
+        stage.close();  // Close the voting window
+
+        Stage resultsStage = new Stage();
+        VBox layout = new VBox(10);
         layout.setAlignment(Pos.CENTER);
 
-        results.forEach((law, result) -> {
-            // Vytvorenie kontajnera pre jednotlivé zákony
-            VBox lawLayout = new VBox(5);
-            lawLayout.setAlignment(Pos.CENTER);
+        String resultText = passed ? "Zákon bol schválený." : "Zákon nebol schválený.";
+        Label finalResultLabel = new Label(resultText);
+        Label zaLabel = new Label("Počet hlasov ZA: " + vysledok.getPocetZa());
+        Label protiLabel = new Label("Počet hlasov PROTI: " + vysledok.getPocetProti());
+        Label zdrzalSaLabel = new Label("Počet zdržalo sa: " + vysledok.getPocetZdrzaloSa());
 
-            String status = result.isSchvaleny() ? "Schválený" : "Neschválený";
-            Label lawLabel = new Label(law + " výsledky:");
-            Label resultsLabel = new Label("Za - " + result.getPocetZa() +
-                    ", Proti - " + result.getPocetProti() + ", Zdržalo sa - " + result.getPocetZdrzaloSa());
-            Label statusLabel = new Label("Stav: " + status);
-
-            // Pridanie prvkov do kontajnera pre zákon
-            lawLayout.getChildren().addAll(lawLabel, resultsLabel, statusLabel);
-
-            // Pridanie kontajnera do hlavného layoutu
-            layout.getChildren().add(lawLayout);
-            layout.getChildren().add(new Separator());  // Separátor medzi zákonmi
-        });
-
-        Scene scene = new Scene(layout, 400, 600);  // Upravené rozmery okna podľa potreby
-        stage.setTitle(title);
-        stage.setScene(scene);
-        stage.show();
+        layout.getChildren().addAll(finalResultLabel, zaLabel, protiLabel, zdrzalSaLabel);
+        Scene scene = new Scene(layout, 350, 250);
+        resultsStage.setTitle("Výsledky hlasovania o zákone: " + lawName);
+        resultsStage.setScene(scene);
+        resultsStage.show();
     }
-
-
-
 }
-

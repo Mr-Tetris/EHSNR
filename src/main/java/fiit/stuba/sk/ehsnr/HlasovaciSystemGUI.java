@@ -1,6 +1,7 @@
 package fiit.stuba.sk.ehsnr;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -19,15 +20,19 @@ public class HlasovaciSystemGUI extends Application {
     private HlasovaciSystemController controller;
     private Button btnStartVoting; // Tlačidlo teraz ako atribút triedy
     private TimerService timerService;
+    private VotingController votingController;
 
     @Override
     public void init() {
         nastavenia = new SystemoveNastavenia();
         HlasovaciSystem hlasovaciSystem = new HlasovaciSystem(nastavenia);
         sedenie = new Sedenie(hlasovaciSystem, nastavenia);
-        controller = new HlasovaciSystemController(sedenie); // Opravené
+        VotingDialog votingDialog = new VotingDialog();
+        votingController = new VotingController(hlasovaciSystem, votingDialog, this);
+        controller = new HlasovaciSystemController(sedenie, hlasovaciSystem, this, votingController);  // Predajte VotingController
         timerService = new TimerService();
     }
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -147,67 +152,74 @@ public class HlasovaciSystemGUI extends Application {
         });
     }
     public void showVotingInterface(Navrh vybranyNavrh) {
+        // Zavolanie metódy na začatie hlasovania
+        controller.zacniHlasovanie(vybranyNavrh);  // Toto začne hlasovanie a nastaví isHlasovanieBezi na true
+
         Stage stage = new Stage();
         stage.setTitle("Hlasovanie: " + vybranyNavrh.getNazov());
 
         VBox layout = new VBox(10);
         layout.setAlignment(Pos.CENTER);
 
-        Label nazovLabel = new Label("Návrh zákona: " + vybranyNavrh.getNazov());
-        Label popisLabel = new Label("Popis: " + vybranyNavrh.getPopis());
-        Label casLabel = new Label(); // Inicializujeme bez textu, nastaví sa v TimerService
-        Label resultLabel = new Label(); // Tento label zobrazí výsledok hlasovania, ako "Hlasovali ste: ZA"
+        Label infoLabel = new Label(vybranyNavrh.getPopis());
+        Label casLabel = new Label("Zostáva: 0 sekúnd");  // Inicializácia s prednastavenou hodnotou
+        Label resultLabel = new Label();
 
-        TimerService timerService = new TimerService(); // Vytvoríme inštanciu TimerService
-        timerService.startTimer(nastavenia.getCasovyLimit(), new TimerService.TimerCallback() {
-            @Override
-            public void onTick(long remainingSeconds) {
-                casLabel.setText("Zostáva: " + remainingSeconds + " sekúnd");
-            }
-
-            @Override
-            public void onFinish() {
-                casLabel.setText("Čas na hlasovanie vypršal");
-                disableVotingButtons(btnVoteFor, btnVoteAgainst, btnAbstain);
-            }
-        });
-
-        // Tlačidlá pre hlasovanie
         Button btnVoteFor = new Button("Hlasovať ZA");
         Button btnVoteAgainst = new Button("Hlasovať PROTI");
         Button btnAbstain = new Button("Zdržať sa hlasovania");
 
-        // Event handlery pre tlačidlá
-        btnVoteFor.setOnAction(event -> {
-            controller.voteFor(vybranyNavrh, resultLabel, timerService);
-            disableVotingButtons(btnVoteFor, btnVoteAgainst, btnAbstain);
-            stage.close();
-        });
+        // Inicializácia a spustenie TimerService, ak je potrebné
+        if (timerService != null) {
+            timerService.startTimer(nastavenia.getCasovyLimit(), new TimerService.TimerCallback() {
+                @Override
+                public void onTick(long remainingSeconds) {
+                    Platform.runLater(() -> casLabel.setText("Zostáva: " + remainingSeconds + " sekúnd"));
+                }
 
-        btnVoteAgainst.setOnAction(event -> {
-            controller.voteAgainst(vybranyNavrh, resultLabel, timerService);
-            disableVotingButtons(btnVoteFor, btnVoteAgainst, btnAbstain);
-            stage.close();
-        });
+                @Override
+                public void onFinish() {
+                    Platform.runLater(() -> {
+                        casLabel.setText("Čas na hlasovanie vypršal");
+                        disableVotingButtons(btnVoteFor, btnVoteAgainst, btnAbstain);
 
-        btnAbstain.setOnAction(event -> {
-            controller.abstain(vybranyNavrh, resultLabel, timerService);
-            disableVotingButtons(btnVoteFor, btnVoteAgainst, btnAbstain);
-            stage.close();
-        });
+                        // Finalizácia hlasovania a spracovanie výsledkov
+                        controller.finalizeVoting(vybranyNavrh.getNazov(), resultLabel, (Boolean passed, Vysledok vysledok) -> {
+                            Platform.runLater(() -> {
+                                // Zobrazenie výsledkov na novom okne
+                                showResultsWindow(vybranyNavrh.getNazov(), passed, vysledok, new Stage());
+                                // Aktualizácia informačného štítku na aktuálnej obrazovke
+                                resultLabel.setText(passed ? "Zákon bol schválený." : "Zákon nebol schválený.");
+                            });
+                        });
+                    });
+                }
+            });
+        } else {
+            casLabel.setText("Chyba: Časovač nie je dostupný");
+        }
 
-        layout.getChildren().addAll(nazovLabel, popisLabel, casLabel, btnVoteFor, btnVoteAgainst, btnAbstain, resultLabel);
+        btnVoteFor.setOnAction(event -> controller.voteFor(vybranyNavrh, resultLabel, timerService));
+        btnVoteAgainst.setOnAction(event -> controller.voteAgainst(vybranyNavrh, resultLabel, timerService));
+        btnAbstain.setOnAction(event -> controller.abstain(vybranyNavrh, resultLabel, timerService));
 
-        Scene scene = new Scene(layout, 400, 300);
+        layout.getChildren().addAll(infoLabel, casLabel, btnVoteFor, btnVoteAgainst, btnAbstain, resultLabel);
+
+        Scene scene = new Scene(layout, 300, 200);
         stage.setScene(scene);
-        stage.showAndWait();
+        stage.showAndWait();  // Zobrazenie okna a čakanie na zatvorenie
     }
 
+
+
+
+    // Pomocná metóda na zakázanie tlačidiel na hlasovanie
     private void disableVotingButtons(Button... buttons) {
         for (Button button : buttons) {
             button.setDisable(true);
         }
     }
+
 
 
 
@@ -255,23 +267,56 @@ public class HlasovaciSystemGUI extends Application {
     }
 
 
-    private void showResults(boolean lawPassed, Vysledok vysledok) {
-        Stage resultsStage = new Stage();
+    public void showResultsWindow(String lawName, boolean passed, Vysledok vysledok, Stage resultsStage) {
         VBox layout = new VBox(10);
         layout.setAlignment(Pos.CENTER);
 
-        String resultText = lawPassed ? "Zákon bol schválený." : "Zákon nebol schválený.";
-        Label resultLabel = new Label(resultText);
+        String resultText = passed ? "Zákon bol schválený." : "Zákon nebol schválený.";
+        Label finalResultLabel = new Label(resultText);
         Label zaLabel = new Label("Počet hlasov ZA: " + vysledok.getPocetZa());
         Label protiLabel = new Label("Počet hlasov PROTI: " + vysledok.getPocetProti());
         Label zdrzalSaLabel = new Label("Počet zdržalo sa: " + vysledok.getPocetZdrzaloSa());
 
-        layout.getChildren().addAll(resultLabel, zaLabel, protiLabel, zdrzalSaLabel);
+        layout.getChildren().addAll(finalResultLabel, zaLabel, protiLabel, zdrzalSaLabel);
 
-        Scene scene = new Scene(layout, 300, 200);
-        resultsStage.setTitle("Výsledky Hlasovania");
+        Scene scene = new Scene(layout, 350, 250);
+        resultsStage.setTitle("Výsledky hlasovania o zákone: " + lawName);
         resultsStage.setScene(scene);
         resultsStage.show();
+    }
+
+
+    public void finalizeVoting(String lawName, Label resultLabel) {
+        votingController.finalizeVoting(lawName, resultLabel, (Boolean passed, Vysledok vysledok) -> {
+            Stage resultsStage = new Stage();
+            VBox layout = new VBox(10);
+            layout.setAlignment(Pos.CENTER);
+
+            String resultText = passed ? "Zákon bol schválený." : "Zákon nebol schválený.";
+            Label finalResultLabel = new Label(resultText);
+            Label zaLabel = new Label("Počet hlasov ZA: " + vysledok.getPocetZa());
+            Label protiLabel = new Label("Počet hlasov PROTI: " + vysledok.getPocetProti());
+            Label zdrzalSaLabel = new Label("Počet zdržalo sa: " + vysledok.getPocetZdrzaloSa());
+
+            Button newProposalButton = new Button("Vytvoriť nový návrh");
+            newProposalButton.setOnAction(e -> handleAddProposal());
+
+            Button voteNextProposalButton = new Button("Hlasovať za ďalší návrh");
+            voteNextProposalButton.setOnAction(e -> showVotingOptions(resultsStage));  // Assume this method refreshes the voting options
+
+            Button exitButton = new Button("Ukončiť program");
+            exitButton.setOnAction(e -> System.exit(0));
+
+            layout.getChildren().addAll(finalResultLabel, zaLabel, protiLabel, zdrzalSaLabel, newProposalButton, voteNextProposalButton, exitButton);
+
+            Scene scene = new Scene(layout, 350, 250);
+            resultsStage.setTitle("Výsledky hlasovania");
+            resultsStage.setScene(scene);
+            resultsStage.show();
+
+            // Update resultLabel for the previous screen if needed
+            resultLabel.setText(resultText);
+        });
     }
 
 

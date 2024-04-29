@@ -38,10 +38,12 @@ public class HlasovaciSystem {
         if (hlasovanieBezi) {
             throw new IllegalStateException("Hlasovanie už bolo zahájené.");
         }
-        this.navrhyNaAgende.clear();  // Vyčistenie starých návrhov
-        this.navrhyNaAgende.add(navrh);  // Pridanie aktuálneho návrhu na hlasovanie
+        this.navrhyNaAgende.clear();
+        this.navrhyNaAgende.add(navrh);
         this.hlasovanieBezi = true;
+        System.out.println("Hlasovanie o návrhu '" + navrh.getNazov() + "' bolo začaté.");
     }
+
 
 
     public void ukonciHlasovanie(String lawName) {
@@ -49,12 +51,10 @@ public class HlasovaciSystem {
         if (vysledok == null) {
             throw new IllegalStateException("Hlasovanie pre tento zákon ešte nebolo zahájené.");
         }
-        System.out.println("Výsledky hlasovania pre zákon " + lawName + ":");
-        System.out.println("Za: " + vysledok.getPocetZa());
-        System.out.println("Proti: " + vysledok.getPocetProti());
-        System.out.println("Zdržalo sa: " + vysledok.getPocetZdrzaloSa());
-        System.out.println("Schválený: " + vysledok.isSchvaleny());
+        this.hlasovanieBezi = false;
+        System.out.println("Hlasovanie o zákone '" + lawName + "' bolo ukončené.");
     }
+
 
 
 
@@ -147,6 +147,7 @@ public class HlasovaciSystem {
     public boolean isHlasovanieBezi() {
         return hlasovanieBezi;
     }
+
 
     public void resetujHlasovanie() {
         vysledkyHlasovania.clear();
