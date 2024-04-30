@@ -75,6 +75,8 @@ public class HlasovaciSystemController {
         });
     }
 
-
+    public List<Navrh> refreshProposalsList() {
+        return sedenie.getNavrhyNaAgende();
+    }
 }
 
