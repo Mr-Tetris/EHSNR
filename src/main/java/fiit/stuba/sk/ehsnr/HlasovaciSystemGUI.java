@@ -52,7 +52,6 @@ public class HlasovaciSystemGUI extends Application {
         btnAddProposal.setOnAction(e -> {
             Stage newStage = new Stage(); // Vytvorí nový Stage ak je potrebné
             handleAddProposal(newStage); // Prenesie existujúcu alebo novú scénu
-            newStage.show(); // Zobrazí okno, ak je to nové
         });
 
 
@@ -146,14 +145,13 @@ public class HlasovaciSystemGUI extends Application {
         });
 
         Optional<Pair<String, String>> result = dialog.showAndWait();
-        result.ifPresent(nazovInfoPair -> {
+        if (result.isPresent()) {
+            Pair<String, String> nazovInfoPair = result.get();
             ZakonNavrh novyNavrh = new ZakonNavrh(nazovInfoPair.getKey(), nazovInfoPair.getValue());
             controller.pridajNavrh(novyNavrh);
             updateResultsDisplay();  // Aktualizácia zobrazenia výsledkov
             showConfirmationDialog(currentStage, "Návrh bol úspešne pridaný.");  // Zobrazí potvrdzovacie okno
-        });
-
-        if (!result.isPresent()) {
+        } else {
             currentStage.close();  // Zatvorenie aktuálneho okna, ak sa stlačí cancel alebo sa okno zatvorí
         }
     }
@@ -168,7 +166,7 @@ public class HlasovaciSystemGUI extends Application {
         ButtonType closeButton = new ButtonType("Zavrieť");
         alert.getButtonTypes().setAll(closeButton);
 
-        alert.showAndWait();
+        alert.showAndWait(); // Zobrazenie alertu a čakanie na reakciu užívateľa
     }
     private void checkInitialVotingSetup() {
         // Kontrola, či sú k dispozícii všetky potrebné informácie na spustenie hlasovania
@@ -308,7 +306,6 @@ public class HlasovaciSystemGUI extends Application {
         createNewProposalButton.setOnAction(e -> {
             Stage newStage = new Stage(); // Vytvorí nový Stage ak je potrebné
             handleAddProposal(newStage); // Prenesie existujúcu alebo novú scénu
-            newStage.show();  // Metóda na spracovanie a zobrazenie formulára pre nový návrh
         });
 
         // Akcia pre ukončenie aplikácie
