@@ -62,7 +62,7 @@ public class HlasovaciSystemController {
     }
 
 
-    public void finalizeVoting(String nazov, Label resultLabel) {
+    public void finalizeVoting(String nazov, Label resultLabel) throws NoVoteException {
         votingController.finalizeVoting(nazov, resultLabel, (Boolean passed, Vysledok vysledok) -> {
             Platform.runLater(() -> {
                 if (passed) {

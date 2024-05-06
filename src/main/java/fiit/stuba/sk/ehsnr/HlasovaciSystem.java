@@ -12,8 +12,9 @@ public class HlasovaciSystem {
     private boolean hlasovanieBezi;
     private Random random;
     private List<Navrh> navrhyNaAgende;
-    private int pocetHlasujucich; // Premenná pre ukladanie počtu hlasujúcich
-    private int casovyLimit;     // Premenná pre ukladanie časového limitu hlasovania
+    private int pocetHlasujucich;
+    private int casovyLimit;
+    private Uzivatel uzivatel; // Pridávame používateľa, ktorý hlasuje
 
     public HlasovaciSystem(SystemoveNastavenia nastavenia) {
         this.nastavenia = nastavenia;
@@ -21,8 +22,9 @@ public class HlasovaciSystem {
         this.hlasovanieBezi = false;
         this.random = new Random();
         this.navrhyNaAgende = new ArrayList<>();
-        this.pocetHlasujucich = 0;  // inicializácia na 0
-        this.casovyLimit = 0;       // inicializácia na 0
+        this.pocetHlasujucich = 0;
+        this.casovyLimit = 0;
+        this.uzivatel = new Uzivatel("default");
     }
 
     // Settery pre počet hlasujúcich a časový limit
@@ -44,26 +46,28 @@ public class HlasovaciSystem {
         System.out.println("Hlasovanie o návrhu '" + navrh.getNazov() + "' bolo začaté.");
     }
 
-
-
     public void ukonciHlasovanie(String lawName) {
         Vysledok vysledok = vysledkyHlasovania.get(lawName);
         if (vysledok == null) {
             throw new IllegalStateException("Hlasovanie pre tento zákon ešte nebolo zahájené.");
         }
-
-        // Generovanie náhodných hlasov
         generujZvysokHlasov(lawName);
-
-        // Aktualizácia stavu hlasovania
         this.hlasovanieBezi = false;
         System.out.println("Hlasovanie o zákone '" + lawName + "' bolo ukončené.");
-
     }
+    public boolean vsetciHlasovali() {
+        return vysledkyHlasovania.values().stream().allMatch(v ->
+                (v.getPocetZa() + v.getPocetProti() + v.getPocetZdrzaloSa()) == pocetHlasujucich);
+    }
+
     public void generujZvysokHlasov(String lawName) {
         Vysledok vysledok = vysledkyHlasovania.get(lawName);
+        if (vysledok == null) {
+            vysledok = new Vysledok(0, 0, 0);  // Inštancovanie prázdneho výsledku
+            vysledkyHlasovania.put(lawName, vysledok);
+        }
+
         int pocetAktualnychHlasov = vysledok.getPocetZa() + vysledok.getPocetProti() + vysledok.getPocetZdrzaloSa();
-        // Získanie celkového počtu hlasujúcich z nastavení
         int celkovyPocetHlasujucich = nastavenia.getPocetHlasujucich();
         int zostavajuciHlasy = celkovyPocetHlasujucich - pocetAktualnychHlasov;
 
@@ -77,13 +81,8 @@ public class HlasovaciSystem {
         for (int i = 0; i < dodatocneHlasy.getPocetZdrzaloSa(); i++) {
             vysledok.pripocitajZdrzaloSa();
         }
-
-        vysledkyHlasovania.put(lawName, vysledok);  // Uloženie updatovanej verzie výsledku
+        vysledkyHlasovania.put(lawName, vysledok);
     }
-
-
-
-
 
 
 
@@ -97,6 +96,7 @@ public class HlasovaciSystem {
         }
         return new Vysledok(pocetZa, pocetProti, pocetZdrzaloSa);
     }
+
     public boolean evaluateLaw(String lawName) {
         Vysledok vysledok = vysledkyHlasovania.get(lawName);
         if (vysledok == null) {
@@ -105,6 +105,7 @@ public class HlasovaciSystem {
         int totalVotes = vysledok.getPocetZa() + vysledok.getPocetProti();
         return vysledok.getPocetZa() > totalVotes / 2;
     }
+
     public void pripocitajHlas(String lawName, String voteType) {
         Vysledok vysledok = vysledkyHlasovania.get(lawName);
         if (vysledok == null) {
@@ -124,15 +125,16 @@ public class HlasovaciSystem {
                 break;
         }
     }
+
     public void odstranNavrh(String lawName) {
         navrhyNaAgende.removeIf(navrh -> navrh.getNazov().equals(lawName));
     }
 
-
     public void pridajNavrh(Navrh navrh) {
         this.navrhyNaAgende.add(navrh);
     }
-    public List<Navrh> getNavrhyNaAgende(){
+
+    public List<Navrh> getNavrhyNaAgende() {
         return new ArrayList<>(navrhyNaAgende);
     }
 
@@ -144,4 +146,7 @@ public class HlasovaciSystem {
         return hlasovanieBezi;
     }
 
+    public int getPocetHlasujucich() {
+        return this.pocetHlasujucich;
+    }
 }

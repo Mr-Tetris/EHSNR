@@ -207,10 +207,17 @@ public class HlasovaciSystemGUI extends Application {
                     Platform.runLater(() -> {
                         casLabel.setText("Čas na hlasovanie vypršal");
                         disableVotingButtons(btnVoteFor, btnVoteAgainst, btnAbstain);
-                        // Zavoláme finalizeVoting na controlleri, ktorý už sa postará o zvyšok logiky
-                        controller.finalizeVoting(vybranyNavrh.getNazov(), resultLabel);
+                        try {
+                            controller.finalizeVoting(vybranyNavrh.getNazov(), resultLabel);
+                        } catch (NoVoteException e) {
+                            resultLabel.setText("Hlasovanie bolo neúspešné z dôvodu neodhlasovania plného počtu hlasujúcich.");
+                            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
+                            alert.setHeaderText("Hlasovanie bolo neúspešné");
+                            alert.showAndWait();
+                        }
                     });
                 }
+
             });
         } else {
             casLabel.setText("Chyba: Časovač nie je dostupný");

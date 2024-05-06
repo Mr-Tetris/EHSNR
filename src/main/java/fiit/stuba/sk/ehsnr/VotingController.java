@@ -1,12 +1,14 @@
 package fiit.stuba.sk.ehsnr;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.util.function.BiConsumer;
 
 public class VotingController {
+    private TimerService timerService;
     private HlasovaciSystem hlasovaciSystem;
     private VotingDialog votingDialog;
     private HlasovaciSystemGUI gui;
@@ -15,27 +17,56 @@ public class VotingController {
         this.hlasovaciSystem = system;
         this.votingDialog = dialog;
         this.gui = gui;
+        this.timerService = new TimerService();
     }
 
-    public void initiateVoting(Stage stage, String lawName, String details, int voters, int timeLimit) {
-        hlasovaciSystem.setPocetHlasujucich(voters);
-        hlasovaciSystem.setCasovyLimit(timeLimit);
-        hlasovaciSystem.zacniHlasovanie(new ZakonNavrh(lawName, details));
-        votingDialog.showVotingDialog(stage, lawName, details, timeLimit, this);
+    public TimerService getTimerService() {
+        return timerService;
     }
 
-    public void finalizeVoting(String lawName, Label resultLabel, BiConsumer<Boolean, Vysledok> resultHandler) {
+    public void initiateVoting(String lawName, String details, int timeLimit, Label timerLabel, Label voteResultLabel, Stage stage) {
+        timerService.startTimer(timeLimit, new TimerService.TimerCallback() {
+            @Override
+            public void onTick(long remainingSeconds) {
+                Platform.runLater(() -> timerLabel.setText("Zostávajúci čas: " + remainingSeconds + " sekúnd"));
+            }
+
+            @Override
+            public void onFinish() {
+                try {
+                    finalizeVoting(lawName, voteResultLabel, (Boolean passed, Vysledok vysledok) -> {
+                        Platform.runLater(() -> {
+                            votingDialog.displayResults(lawName, passed, vysledok, stage);
+                        });
+                    });
+                } catch (NoVoteException e) {
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Hlasovanie bolo neúspešné");
+                        alert.setHeaderText("Neúspešné hlasovanie");
+                        alert.setContentText(e.getMessage());
+                        alert.showAndWait();
+                        votingDialog.displayResults(lawName, false, new Vysledok(0, 0, 0), stage);
+                    });
+                }
+            }
+        });
+    }
+
+    public void finalizeVoting(String lawName, Label resultLabel, BiConsumer<Boolean, Vysledok> resultHandler) throws NoVoteException {
         if (!hlasovaciSystem.isHlasovanieBezi()) {
             Platform.runLater(() -> resultLabel.setText("Hlasovanie nebolo zahájené alebo už bolo ukončené."));
             return;
         }
 
-        // Generovanie zostávajúcich hlasov
-        hlasovaciSystem.generujZvysokHlasov(lawName); // Táto metóda musí byť implementovaná v HlasovaciSystem
-
-        // Ukončenie hlasovania
+        hlasovaciSystem.generujZvysokHlasov(lawName);
         hlasovaciSystem.ukonciHlasovanie(lawName);
-        hlasovaciSystem.odstranNavrh(lawName);
+
+        // Skontrolovať, či všetci hlasovali
+        if (!hlasovaciSystem.vsetciHlasovali()) {
+            throw new NoVoteException("Hlasovanie bolo neúspešné z dôvodu neodhlasovania plného počtu hlasujúcich.");
+        }
+
         boolean lawPassed = hlasovaciSystem.evaluateLaw(lawName);
         Vysledok vysledok = hlasovaciSystem.getVysledkyHlasovania().get(lawName);
 
@@ -45,10 +76,8 @@ public class VotingController {
         });
     }
 
-
     public void recordVote(String voteType, String lawName, Label resultLabel) {
         hlasovaciSystem.pripocitajHlas(lawName, voteType);
         resultLabel.setText("Váš hlas: " + voteType);
     }
-
 }

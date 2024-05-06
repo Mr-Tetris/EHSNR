@@ -2,6 +2,9 @@ package fiit.stuba.sk.ehsnr;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 public class TimerService {
     private AnimationTimer timer;
@@ -9,10 +12,9 @@ public class TimerService {
     private long endTime;
     private long remainingSeconds;
 
-    // Interface pre callback, ktorý umožňuje aktualizáciu GUI a spracovanie výsledkov
     public interface TimerCallback {
         void onTick(long remainingSeconds);
-        void onFinish();
+        void onFinish() throws NoVoteException;
     }
 
     private TimerCallback callback;
@@ -33,16 +35,23 @@ public class TimerService {
             public void handle(long now) {
                 long elapsedMillis = System.currentTimeMillis() - startTime;
                 remainingSeconds = (endTime - System.currentTimeMillis()) / 1000;
-
                 if (remainingSeconds <= 0) {
-                    // Ak vypršal čas, zastavíme časovač a vyvoláme onFinish
                     timer.stop();
-                    remainingSeconds = 0; // Uistíme sa, že zostávajúce sekundy nie sú záporné
-                    if (callback != null) {
-                        Platform.runLater(callback::onFinish);
+                    remainingSeconds = 0;
+                    try {
+                        Platform.runLater(() -> {
+                            if (callback != null) {
+                                try {
+                                    callback.onFinish();
+                                } catch (NoVoteException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 } else {
-                    // Inak pokračujeme v aktualizácii
                     if (callback != null) {
                         Platform.runLater(() -> callback.onTick(remainingSeconds));
                     }
@@ -52,17 +61,6 @@ public class TimerService {
         timer.start();
     }
 
-    // Metóda na pokračovanie časovača bez reštartovania
-    public void continueTimer() {
-        if (timer != null && remainingSeconds > 0) {
-            // Ak timer beží a čas ešte nevypršal, len pokračujeme
-            startTime = System.currentTimeMillis();
-            endTime = startTime + remainingSeconds * 1000;
-            timer.start();
-        }
-    }
-
-    // Zastavenie časovača
     public void stopTimer() {
         if (timer != null) {
             timer.stop();
@@ -70,7 +68,14 @@ public class TimerService {
         }
     }
 
-    // Získanie zostávajúcich sekúnd
+    public void continueTimer() {
+        if (timer != null && remainingSeconds > 0) {
+            startTime = System.currentTimeMillis();
+            endTime = startTime + remainingSeconds * 1000;
+            timer.start();
+        }
+    }
+
     public long getRemainingSeconds() {
         return remainingSeconds;
     }
