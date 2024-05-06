@@ -25,6 +25,10 @@ public class HlasovaciSystemController {
     public void pridajNavrh(Navrh navrh) {
         sedenie.pridajNavrhNaAgendu(navrh);
     }
+    public void odstranNavrh(String lawName) throws NoVoteException {
+        sedenie.ukonciSedenie(lawName);  // Toto zavolá metódu na ukončenie hlasovania a odstránenie návrhu
+    }
+
 
     public List<Navrh> getNavrhyNaAgendu() {
         return sedenie.getNavrhyNaAgende();

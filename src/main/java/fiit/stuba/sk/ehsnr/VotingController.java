@@ -72,7 +72,11 @@ public class VotingController {
 
         Platform.runLater(() -> {
             resultHandler.accept(lawPassed, vysledok);
-            gui.showResultsWindow(lawName, lawPassed, vysledok, new Stage());
+            try {
+                gui.showResultsWindow(lawName, lawPassed, vysledok, new Stage());
+            } catch (NoVoteException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 

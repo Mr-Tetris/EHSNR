@@ -287,7 +287,7 @@ public class HlasovaciSystemGUI extends Application {
     }
 
 
-    public void showResultsWindow(String lawName, boolean passed, Vysledok vysledok, Stage resultsStage) {
+    public void showResultsWindow(String lawName, boolean passed, Vysledok vysledok, Stage resultsStage) throws NoVoteException {
         resultsLayout = new VBox(10);
         resultsLayout.setAlignment(Pos.CENTER);
 
@@ -298,6 +298,9 @@ public class HlasovaciSystemGUI extends Application {
         Label zdrzalSaLabel = new Label("Počet zdržalo sa: " + vysledok.getPocetZdrzaloSa());
 
         resultsLayout.getChildren().addAll(finalResultLabel, zaLabel, protiLabel, zdrzalSaLabel);
+
+        // Odstráni návrh z hlasovania
+        controller.odstranNavrh(lawName);
 
         Button continueVotingButton = new Button("Pokračovať v ďalšom hlasovaní");
         Button createNewProposalButton = new Button("Vytvoriť nový návrh");
@@ -331,6 +334,7 @@ public class HlasovaciSystemGUI extends Application {
         resultsStage.setScene(scene);
         resultsStage.show();
     }
+
 
     public void updateResultsDisplay() {
         if (resultsLayout != null) {

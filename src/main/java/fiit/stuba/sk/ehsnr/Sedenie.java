@@ -26,7 +26,13 @@ public class Sedenie {
     }
 
     public void ukonciSedenie(String lawName) throws NoVoteException {
-        hlasovaciSystem.ukonciHlasovanie(lawName);  // Prenos názvu zákona alebo identifikátora
+        hlasovaciSystem.ukonciHlasovanie(lawName);
+        odstranNavrhNaAgende(lawName); // Odstráňte návrh po ukončení hlasovania
         System.out.println("Hlasovanie pre zákon '" + lawName + "' bolo ukončené.");
+    }
+
+    public void odstranNavrhNaAgende(String lawName) {
+        hlasovaciSystem.odstranNavrh(lawName);  // Prenos názvu zákona alebo identifikátora
+        System.out.println("Návrh '" + lawName + "' bol odstránený z agendy.");
     }
 }
