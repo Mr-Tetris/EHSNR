@@ -25,7 +25,7 @@ public class Sedenie {
         System.out.println("Hlasovanie o zakone '" + vybranyNavrh.getNazov() + "' začína.");
     }
 
-    public void ukonciSedenie(String lawName) {
+    public void ukonciSedenie(String lawName) throws NoVoteException {
         hlasovaciSystem.ukonciHlasovanie(lawName);  // Prenos názvu zákona alebo identifikátora
         System.out.println("Hlasovanie pre zákon '" + lawName + "' bolo ukončené.");
     }

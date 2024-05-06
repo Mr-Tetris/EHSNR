@@ -10,25 +10,25 @@ public class Vysledok {
         this.pocetZa = pocetZa;
         this.pocetProti = pocetProti;
         this.pocetZdrzaloSa = pocetZdrzaloSa;
-        this.schvaleny = vyhodnot();
+        this.schvaleny = false;
     }
 
     public void pripocitajZa() {
         pocetZa++;
-        this.schvaleny = vyhodnot();  // Re-evaluácia stavu schválenia
+        vyhodnot();
     }
 
     public void pripocitajProti() {
         pocetProti++;
-        this.schvaleny = vyhodnot();
+        vyhodnot();
     }
 
     public void pripocitajZdrzaloSa() {
         pocetZdrzaloSa++;
-        this.schvaleny = vyhodnot();
+        vyhodnot();
     }
 
-    private boolean vyhodnot() {
+    public boolean vyhodnot() {
         int celkovyPocet = pocetZa + pocetProti;
         return celkovyPocet > 0 && pocetZa > celkovyPocet / 2;
     }
@@ -47,6 +47,16 @@ public class Vysledok {
 
     public boolean isSchvaleny() {
         return schvaleny;
+    }
+
+    @Override
+    public String toString() {
+        return "Vysledok{" +
+                "pocetZa=" + pocetZa +
+                ", pocetProti=" + pocetProti +
+                ", pocetZdrzaloSa=" + pocetZdrzaloSa +
+                ", schvaleny=" + schvaleny +
+                '}';
     }
 }
 

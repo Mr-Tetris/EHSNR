@@ -46,7 +46,7 @@ public class HlasovaciSystem {
         System.out.println("Hlasovanie o návrhu '" + navrh.getNazov() + "' bolo začaté.");
     }
 
-    public void ukonciHlasovanie(String lawName) {
+    public void ukonciHlasovanie(String lawName) throws NoVoteException {
         Vysledok vysledok = vysledkyHlasovania.get(lawName);
         if (vysledok == null) {
             throw new IllegalStateException("Hlasovanie pre tento zákon ešte nebolo zahájené.");
@@ -56,15 +56,15 @@ public class HlasovaciSystem {
         System.out.println("Hlasovanie o zákone '" + lawName + "' bolo ukončené.");
     }
     public boolean vsetciHlasovali() {
+        setPocetHlasujucich(nastavenia.getPocetHlasujucich());
         return vysledkyHlasovania.values().stream().allMatch(v ->
                 (v.getPocetZa() + v.getPocetProti() + v.getPocetZdrzaloSa()) == pocetHlasujucich);
     }
 
-    public void generujZvysokHlasov(String lawName) {
+    public void generujZvysokHlasov(String lawName) throws NoVoteException {
         Vysledok vysledok = vysledkyHlasovania.get(lawName);
         if (vysledok == null) {
-            vysledok = new Vysledok(0, 0, 0);  // Inštancovanie prázdneho výsledku
-            vysledkyHlasovania.put(lawName, vysledok);
+            throw new NoVoteException("Hlasovanie bolo neúspešné z dôvodu neodhlasovania plného počtu hlasujúcich.");
         }
 
         int pocetAktualnychHlasov = vysledok.getPocetZa() + vysledok.getPocetProti() + vysledok.getPocetZdrzaloSa();
@@ -81,8 +81,12 @@ public class HlasovaciSystem {
         for (int i = 0; i < dodatocneHlasy.getPocetZdrzaloSa(); i++) {
             vysledok.pripocitajZdrzaloSa();
         }
+
+        vysledok.vyhodnot(); // Explicitné vyhodnotenie po pripočítaní všetkých hlasov
         vysledkyHlasovania.put(lawName, vysledok);
     }
+
+
 
 
 
@@ -107,6 +111,10 @@ public class HlasovaciSystem {
     }
 
     public void pripocitajHlas(String lawName, String voteType) {
+        if (!hlasovanieBezi) {
+            throw new IllegalStateException("Hlasovanie pre tento zákon ešte nezačalo.");
+        }
+
         Vysledok vysledok = vysledkyHlasovania.get(lawName);
         if (vysledok == null) {
             vysledok = new Vysledok(0, 0, 0);
@@ -124,7 +132,11 @@ public class HlasovaciSystem {
                 vysledok.pripocitajZdrzaloSa();
                 break;
         }
+
+        uzivatel.hlasuj(); // Tu nastavíme, že užívateľ hlasoval
     }
+
+
 
     public void odstranNavrh(String lawName) {
         navrhyNaAgende.removeIf(navrh -> navrh.getNazov().equals(lawName));
