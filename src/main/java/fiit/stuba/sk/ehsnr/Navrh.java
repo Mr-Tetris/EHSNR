@@ -15,24 +15,8 @@ public abstract class Navrh {
         return nazov;
     }
 
-    public void setNazov(String nazov) {
-        this.nazov = nazov;
-    }
-
     public String getPopis() {
         return popis;
-    }
-
-    public void setPopis(String popis) {
-        this.popis = popis;
-    }
-
-    public String getStav() {
-        return stav;
-    }
-
-    public void setStav(String stav) {
-        this.stav = stav;
     }
 
     public abstract void aktualizujStavNaZakladeHlasovania(Vysledok vysledok);

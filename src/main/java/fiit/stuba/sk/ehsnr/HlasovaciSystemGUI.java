@@ -9,9 +9,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import javafx.util.StringConverter;
-
-
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +28,7 @@ public class HlasovaciSystemGUI extends Application {
         sedenie = new Sedenie(hlasovaciSystem, nastavenia);
         VotingDialog votingDialog = new VotingDialog();
         votingController = new VotingController(hlasovaciSystem, votingDialog, this);
-        controller = new HlasovaciSystemController(sedenie, hlasovaciSystem, this, votingController);  // Predajte VotingController
+        controller = new HlasovaciSystemController(sedenie, hlasovaciSystem, this, votingController);
         timerService = new TimerService();
     }
 
@@ -50,12 +47,12 @@ public class HlasovaciSystemGUI extends Application {
         checkInitialVotingSetup();
         btnStartVoting.setOnAction(e -> showVotingOptions(primaryStage));
         btnAddProposal.setOnAction(e -> {
-            Stage newStage = new Stage(); // Vytvorí nový Stage ak je potrebné
-            handleAddProposal(newStage); // Prenesie existujúcu alebo novú scénu
+            Stage newStage = new Stage();
+            handleAddProposal(newStage);
         });
 
 
-        btnSettings.setOnAction(e -> handleSettings(primaryStage));  // Pridávame primaryStage pre možné použitie v nastaveniach
+        btnSettings.setOnAction(e -> handleSettings(primaryStage));
         btnExit.setOnAction(e -> primaryStage.close());
 
         VBox layout = new VBox(10, welcomeLabel, btnStartVoting, btnAddProposal, btnSettings, btnExit);
@@ -65,14 +62,13 @@ public class HlasovaciSystemGUI extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        checkVotingEligibility();  // Skontrolujte, či sú splnené požiadavky pre začatie hlasovania
+        checkVotingEligibility();
     }
 
     private void checkVotingEligibility() {
         boolean isEligible = nastavenia.getPocetHlasujucich() > 0 && nastavenia.getCasovyLimit() > 0 && !controller.getNavrhyNaAgendu().isEmpty();
         btnStartVoting.setDisable(!isEligible);
     }
-
 
     private void handleSettings(Stage parentStage) {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
@@ -110,7 +106,7 @@ public class HlasovaciSystemGUI extends Application {
             int cas = Integer.parseInt(settings.getValue());
             nastavenia.setPocetHlasujucich(pocet);
             nastavenia.setCasovyLimit(cas);
-            checkVotingEligibility();  // Aktualizácia stavu tlačidla po zatvorení nastavení
+            checkVotingEligibility();
         });
     }
 
@@ -149,10 +145,10 @@ public class HlasovaciSystemGUI extends Application {
             Pair<String, String> nazovInfoPair = result.get();
             ZakonNavrh novyNavrh = new ZakonNavrh(nazovInfoPair.getKey(), nazovInfoPair.getValue());
             controller.pridajNavrh(novyNavrh);
-            updateResultsDisplay();  // Aktualizácia zobrazenia výsledkov
-            showConfirmationDialog(currentStage, "Návrh bol úspešne pridaný.");  // Zobrazí potvrdzovacie okno
+            updateResultsDisplay();
+            showConfirmationDialog(currentStage, "Návrh bol úspešne pridaný.");
         } else {
-            currentStage.close();  // Zatvorenie aktuálneho okna, ak sa stlačí cancel alebo sa okno zatvorí
+            currentStage.close();
         }
     }
 
@@ -166,10 +162,9 @@ public class HlasovaciSystemGUI extends Application {
         ButtonType closeButton = new ButtonType("Zavrieť");
         alert.getButtonTypes().setAll(closeButton);
 
-        alert.showAndWait(); // Zobrazenie alertu a čakanie na reakciu užívateľa
+        alert.showAndWait();
     }
     private void checkInitialVotingSetup() {
-        // Kontrola, či sú k dispozícii všetky potrebné informácie na spustenie hlasovania
         boolean isReadyToStartVoting = !controller.getNavrhyNaAgendu().isEmpty() &&
                 nastavenia.getPocetHlasujucich() > 0 &&
                 nastavenia.getCasovyLimit() > 0;
@@ -177,8 +172,7 @@ public class HlasovaciSystemGUI extends Application {
     }
 
     public void showVotingInterface(Navrh vybranyNavrh) {
-        // Zavolanie metódy na začatie hlasovania
-        controller.zacniHlasovanie(vybranyNavrh);  // Toto začne hlasovanie a nastaví isHlasovanieBezi na true
+        controller.zacniHlasovanie(vybranyNavrh);
 
         Stage stage = new Stage();
         stage.setTitle("Hlasovanie: " + vybranyNavrh.getNazov());
@@ -187,14 +181,13 @@ public class HlasovaciSystemGUI extends Application {
         layout.setAlignment(Pos.CENTER);
 
         Label infoLabel = new Label(vybranyNavrh.getPopis());
-        Label casLabel = new Label("Zostáva: 0 sekúnd");  // Inicializácia s prednastavenou hodnotou
+        Label casLabel = new Label("Zostáva: 0 sekúnd");
         Label resultLabel = new Label();
 
         Button btnVoteFor = new Button("Hlasovať ZA");
         Button btnVoteAgainst = new Button("Hlasovať PROTI");
         Button btnAbstain = new Button("Zdržať sa hlasovania");
 
-        // Inicializácia a spustenie TimerService, ak je potrebné
         if (timerService != null) {
             timerService.startTimer(nastavenia.getCasovyLimit(), new TimerService.TimerCallback() {
                 @Override
@@ -231,23 +224,14 @@ public class HlasovaciSystemGUI extends Application {
 
         Scene scene = new Scene(layout, 300, 200);
         stage.setScene(scene);
-        stage.showAndWait();  // Zobrazenie okna a čakanie na zatvorenie
+        stage.showAndWait();
     }
 
-
-
-
-    // Pomocná metóda na zakázanie tlačidiel na hlasovanie
     private void disableVotingButtons(Button... buttons) {
         for (Button button : buttons) {
             button.setDisable(true);
         }
     }
-
-
-
-
-
 
     private void showVotingOptions(Stage primaryStage) {
         List<Navrh> navrhy = controller.getNavrhyNaAgendu();
@@ -281,13 +265,12 @@ public class HlasovaciSystemGUI extends Application {
 
         Optional<Navrh> result = dialog.showAndWait();
         result.ifPresent(navrh -> {
-            primaryStage.close(); // Zatvorte hlavné okno pred zobrazením hlasovacieho rozhrania
-            showVotingInterface(navrh); // Tu sa zavolá metóda pre zobrazenie hlasovacieho rozhrania
+            primaryStage.close();
+            showVotingInterface(navrh);
         });
     }
 
-
-    public void showResultsWindow(String lawName, boolean passed, Vysledok vysledok, Stage resultsStage) throws NoVoteException {
+    public void showResultsWindow(String lawName, boolean passed, Vysledok vysledok, Stage resultsStage) {
         resultsLayout = new VBox(10);
         resultsLayout.setAlignment(Pos.CENTER);
 
@@ -299,34 +282,26 @@ public class HlasovaciSystemGUI extends Application {
 
         resultsLayout.getChildren().addAll(finalResultLabel, zaLabel, protiLabel, zdrzalSaLabel);
 
-        // Odstráni návrh z hlasovania
-        controller.odstranNavrh(lawName);
-
         Button continueVotingButton = new Button("Pokračovať v ďalšom hlasovaní");
         Button createNewProposalButton = new Button("Vytvoriť nový návrh");
         Button exitButton = new Button("Ukončiť");
 
-        // Akcia pre pokračovanie v hlasovaní
         continueVotingButton.setOnAction(e -> {
             resultsStage.close();
             showVotingOptions(new Stage());
         });
 
-        // Akcia pre vytvorenie nového návrhu
         createNewProposalButton.setOnAction(e -> {
-            Stage newStage = new Stage(); // Vytvorí nový Stage ak je potrebné
-            handleAddProposal(newStage); // Prenesie existujúcu alebo novú scénu
+            Stage newStage = new Stage();
+            handleAddProposal(newStage);
         });
 
-        // Akcia pre ukončenie aplikácie
         exitButton.setOnAction(e -> {
             Platform.exit();
         });
 
-        // Skontrolujeme, či sú ešte nejaké návrhy na hlasovanie
         continueVotingButton.setDisable(controller.getNavrhyNaAgendu().isEmpty());
 
-        // Pridanie tlačítok do layoutu
         resultsLayout.getChildren().addAll(continueVotingButton, createNewProposalButton, exitButton);
 
         Scene scene = new Scene(resultsLayout, 350, 250);
@@ -334,7 +309,6 @@ public class HlasovaciSystemGUI extends Application {
         resultsStage.setScene(scene);
         resultsStage.show();
     }
-
 
     public void updateResultsDisplay() {
         if (resultsLayout != null) {
@@ -361,22 +335,11 @@ public class HlasovaciSystemGUI extends Application {
 
             resultsLayout.getChildren().addAll(continueVotingButton, createNewProposalButton, exitButton);
 
-            // Kontrola, či je možné zapnúť tlačidlo na spustenie hlasovania
-            checkInitialVotingSetup(); // Znova skontroluje, či sú splnené všetky podmienky pre spustenie hlasovania
+            checkInitialVotingSetup();
         } else {
             System.out.println("Výsledkový layout nebol inicializovaný.");
         }
     }
-
-
-
-
-
-
-
-
-
-
 
     public static void main(String[] args) {
         launch(args);

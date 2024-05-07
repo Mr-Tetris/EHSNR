@@ -10,14 +10,6 @@ public class ReferendumNavrh extends Navrh {
         this.otazka = otazka;
     }
 
-    public String getOtazka() {
-        return otazka;
-    }
-
-    public void setOtazka(String otazka) {
-        this.otazka = otazka;
-    }
-
     @Override
     public void aktualizujStavNaZakladeHlasovania(Vysledok vysledok) {
         if (vysledok.isSchvaleny()) {

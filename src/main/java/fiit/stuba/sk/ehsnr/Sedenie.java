@@ -17,22 +17,22 @@ public class Sedenie {
 
 
     public void pridajNavrhNaAgendu(Navrh navrh) {
-        hlasovaciSystem.pridajNavrh(navrh);  // Asumujeme, že hlasovací systém môže spravovať svoje návrhy
+        hlasovaciSystem.pridajNavrh(navrh);
     }
 
     public void zahajSedenie(Navrh vybranyNavrh) {
-        hlasovaciSystem.zacniHlasovanie(vybranyNavrh);  // Prenesú sa všetky potrebné informácie
+        hlasovaciSystem.zacniHlasovanie(vybranyNavrh);
         System.out.println("Hlasovanie o zakone '" + vybranyNavrh.getNazov() + "' začína.");
     }
 
     public void ukonciSedenie(String lawName) throws NoVoteException {
         hlasovaciSystem.ukonciHlasovanie(lawName);
-        odstranNavrhNaAgende(lawName); // Odstráňte návrh po ukončení hlasovania
+        odstranNavrhNaAgende(lawName);
         System.out.println("Hlasovanie pre zákon '" + lawName + "' bolo ukončené.");
     }
 
     public void odstranNavrhNaAgende(String lawName) {
-        hlasovaciSystem.odstranNavrh(lawName);  // Prenos názvu zákona alebo identifikátora
+        hlasovaciSystem.odstranNavrh(lawName);
         System.out.println("Návrh '" + lawName + "' bol odstránený z agendy.");
     }
 }

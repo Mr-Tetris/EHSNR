@@ -9,25 +9,12 @@ public class Uzivatel {
         this.uzHlasoval = false;
     }
 
-    public String getMeno() {
-        return meno;
-    }
-
-    public void setMeno(String meno) {
-        this.meno = meno;
-    }
-
-    public boolean isUzHlasoval() {
-        return uzHlasoval;
-    }
-
     public void hlasuj() {
         if (uzHlasoval) {
             throw new IllegalStateException("Tento užívateľ už hlasoval.");
         }
         uzHlasoval = true;
     }
-
 
     public void resetujHlasovanie() {
         uzHlasoval = false;

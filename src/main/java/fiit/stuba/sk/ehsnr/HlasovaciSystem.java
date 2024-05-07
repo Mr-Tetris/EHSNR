@@ -14,7 +14,7 @@ public class HlasovaciSystem {
     private List<Navrh> navrhyNaAgende;
     private int pocetHlasujucich;
     private int casovyLimit;
-    private Uzivatel uzivatel; // Pridávame používateľa, ktorý hlasuje
+    private Uzivatel uzivatel;
 
     public HlasovaciSystem(SystemoveNastavenia nastavenia) {
         this.nastavenia = nastavenia;
@@ -27,13 +27,8 @@ public class HlasovaciSystem {
         this.uzivatel = new Uzivatel("default");
     }
 
-    // Settery pre počet hlasujúcich a časový limit
     public void setPocetHlasujucich(int pocet) {
         this.pocetHlasujucich = pocet;
-    }
-
-    public void setCasovyLimit(int limit) {
-        this.casovyLimit = limit;
     }
 
     public synchronized void zacniHlasovanie(Navrh navrh) {
@@ -52,9 +47,14 @@ public class HlasovaciSystem {
             throw new IllegalStateException("Hlasovanie pre tento zákon ešte nebolo zahájené.");
         }
         generujZvysokHlasov(lawName);
+        if (!vsetciHlasovali()) {
+            throw new NoVoteException("Hlasovanie bolo neúspešné z dôvodu neodhlasovania plného počtu hlasujúcich.");
+        }
         this.hlasovanieBezi = false;
+        odstranNavrh(lawName);
         System.out.println("Hlasovanie o zákone '" + lawName + "' bolo ukončené.");
     }
+
     public boolean vsetciHlasovali() {
         setPocetHlasujucich(nastavenia.getPocetHlasujucich());
         return vysledkyHlasovania.values().stream().allMatch(v ->
@@ -82,13 +82,9 @@ public class HlasovaciSystem {
             vysledok.pripocitajZdrzaloSa();
         }
 
-        vysledok.vyhodnot(); // Explicitné vyhodnotenie po pripočítaní všetkých hlasov
+        vysledok.vyhodnot();
         vysledkyHlasovania.put(lawName, vysledok);
     }
-
-
-
-
 
     private Vysledok vygenerujVysledky(int pocetHlasujucich) {
         int pocetZa = 0, pocetProti = 0, pocetZdrzaloSa = 0;
@@ -133,10 +129,8 @@ public class HlasovaciSystem {
                 break;
         }
 
-        uzivatel.hlasuj(); // Tu nastavíme, že užívateľ hlasoval
+        uzivatel.hlasuj();
     }
-
-
 
     public void odstranNavrh(String lawName) {
         navrhyNaAgende.removeIf(navrh -> navrh.getNazov().equals(lawName));
