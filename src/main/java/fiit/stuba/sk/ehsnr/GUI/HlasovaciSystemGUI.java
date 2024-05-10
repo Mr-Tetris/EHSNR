@@ -13,7 +13,10 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * Grafické používateľské rozhranie pre Elektronický Hlasovací Systém Národnej Rady.
+ * Táto trieda je zodpovedná za vytvorenie a správu GUI komponentov, ako sú tlačidlá, dialógy a zobrazenia výsledkov.
+ */
 public class HlasovaciSystemGUI extends Application {
     private Sedenie sedenie;
     private SystemoveNastavenia nastavenia;
@@ -22,7 +25,9 @@ public class HlasovaciSystemGUI extends Application {
     private TimerService timerService;
     private VotingController votingController;
     private VBox resultsLayout;
-
+    /**
+     * Inicializuje hlavné komponenty systému pred spustením grafického rozhrania.
+     */
     @Override
     public void init() {
         nastavenia = new SystemoveNastavenia();
@@ -33,6 +38,10 @@ public class HlasovaciSystemGUI extends Application {
         timerService = new TimerService();
     }
 
+    /**
+     * Zaháji grafické rozhranie a nastaví primárnu scénu.
+     * @param primaryStage Primárne javisko, na ktorom sa zobrazujú grafické komponenty.
+     */
 
     @Override
     public void start(Stage primaryStage) {
@@ -65,12 +74,17 @@ public class HlasovaciSystemGUI extends Application {
 
         checkVotingEligibility();
     } // Úvodná obrazovka
-
+    /**
+     * Skontroluje oprávnenie na zahájenie hlasovania na základe dostupnosti návrhov a nastavení systému.
+     */
     private void checkVotingEligibility() {
         boolean isEligible = nastavenia.getPocetHlasujucich() > 0 && nastavenia.getCasovyLimit() > 0 && !controller.getNavrhyNaAgendu().isEmpty();
         btnStartVoting.setDisable(!isEligible);
     } // Kontrola oprávnenosti hlasovania
-
+    /**
+     * Zobrazí dialóg pre nastavenie parametrov hlasovania, ako sú počet hlasujúcich a časový limit.
+     * @param parentStage Stage, ktorý slúži ako rodičovské okno pre dialóg.
+     */
     private void handleSettings(Stage parentStage) {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Nastavenia Hlasovania");
@@ -111,7 +125,10 @@ public class HlasovaciSystemGUI extends Application {
         });
     } // Nastavenia hlasovania
 
-
+    /**
+     * Otvorí dialóg na pridanie nového návrhu a spracuje vstup od používateľa.
+     * @param currentStage Stage pre zobrazenie dialógu.
+     */
     public void handleAddProposal(Stage currentStage) {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Pridanie Návrhu");
@@ -153,7 +170,9 @@ public class HlasovaciSystemGUI extends Application {
         }
     } // Pridanie návrhu
 
-
+    /**
+     * Skontroluje, či sú splnené všetky podmienky pre začatie hlasovania.
+     */
     public void showConfirmationDialog(Stage stage, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Potvrdenie");
@@ -171,7 +190,10 @@ public class HlasovaciSystemGUI extends Application {
                 nastavenia.getCasovyLimit() > 0;
         btnStartVoting.setDisable(!isReadyToStartVoting);
     } // Kontrola počiatočného nastavenia hlasovania
-
+    /**
+     * Zobrazí rozhranie pre hlasovanie pre vybraný návrh.
+     * @param vybranyNavrh Návrh, pre ktorý sa má zobraziť hlasovacie rozhranie.
+     */
     public void showVotingInterface(Navrh vybranyNavrh) {
         controller.zacniHlasovanie(vybranyNavrh);
 
@@ -227,13 +249,19 @@ public class HlasovaciSystemGUI extends Application {
         stage.setScene(scene);
         stage.showAndWait();
     } // Rozhranie hlasovania
-
+    /**
+     * Zakáže tlačidlá na hlasovanie po uplynutí časového limitu alebo po dokončení hlasovania.
+     * @param buttons Zoznam tlačidiel, ktoré majú byť zakázané.
+     */
     private void disableVotingButtons(Button... buttons) {
         for (Button button : buttons) {
             button.setDisable(true);
         }
     } // Zablokovanie tlačidiel hlasovania
-
+    /**
+     * Zobrazí dialóg s možnosťami návrhov na hlasovanie.
+     * @param primaryStage Primárne javisko, ktoré sa použije pre dialóg.
+     */
     private void showVotingOptions(Stage primaryStage) {
         List<Navrh> navrhy = controller.getNavrhyNaAgendu();
         if (navrhy.isEmpty()) {
@@ -270,7 +298,13 @@ public class HlasovaciSystemGUI extends Application {
             showVotingInterface(navrh);
         });
     } // Možnosti hlasovania
-
+    /**
+     * Zobrazí výsledky hlasovania a poskytne možnosti pre ďalšie kroky, ako je pokračovanie v hlasovaní alebo ukončenie.
+     * @param lawName Názov zákona, pre ktorý boli zobrazené výsledky.
+     * @param passed Bool hodnota, či bol zákon schválený.
+     * @param vysledok Výsledok hlasovania.
+     * @param resultsStage Stage pre zobrazenie výsledkov.
+     */
     public void showResultsWindow(String lawName, boolean passed, Vysledok vysledok, Stage resultsStage) {
         resultsLayout = new VBox(10);
         resultsLayout.setAlignment(Pos.CENTER);
@@ -310,7 +344,9 @@ public class HlasovaciSystemGUI extends Application {
         resultsStage.setScene(scene);
         resultsStage.show();
     } // Výsledky hlasovania
-
+    /**
+     * Aktualizuje zobrazenie výsledkov na základe dostupných dát.
+     */
     public void updateResultsDisplay() {
         if (resultsLayout != null) {
             resultsLayout.getChildren().clear();
@@ -341,7 +377,10 @@ public class HlasovaciSystemGUI extends Application {
             System.out.println("Výsledkový layout nebol inicializovaný.");
         }
     } // Aktualizácia zobrazenia výsledkov
-
+    /**
+     * Hlavná spúšťacia metóda pre aplikáciu.
+     * @param args Argumenty príkazového riadku.
+     */
     public static void main(String[] args) {
         launch(args);
     } // Spustenie aplikácie

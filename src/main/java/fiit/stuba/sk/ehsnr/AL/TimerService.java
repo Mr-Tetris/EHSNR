@@ -2,7 +2,9 @@ package fiit.stuba.sk.ehsnr.AL;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-
+/**
+ * TimeService poskytuje funkčnosť časovača pre hlasovací systém, umožňujúc sledovanie časového limitu pre hlasovanie a spúšťanie akcií na základe uplynutia času.
+ */
 public class TimerService {
     private AnimationTimer timer;
     private long startTime;
@@ -15,8 +17,11 @@ public class TimerService {
     }
 
     private TimerCallback callback;
-
-    // Spustenie časovača s daným trvaním a callbackom
+    /**
+     * Spustí časovač s danou dĺžkou trvania a callback funkciou, ktorá sa vykoná pri každom tiknutí a na konci časovača.
+     * @param durationInSeconds Doba trvania časovača v sekundách.
+     * @param callback Callback funkcia, ktorá obsahuje metódy onTick a onFinish pre spracovanie tiknutí a ukončenia časovača.
+     */
     public void startTimer(int durationInSeconds, TimerCallback callback) {
         this.callback = callback;
         this.remainingSeconds = durationInSeconds;
@@ -58,7 +63,9 @@ public class TimerService {
         timer.start();
     }
 
-
+    /**
+     * Pokračuje v časovaní od posledného zaznamenaného času, ak časovač ešte nevypršal.
+     */
     public void continueTimer() { // Pokračovanie časovača
         if (timer != null && remainingSeconds > 0) {
             startTime = System.currentTimeMillis();
