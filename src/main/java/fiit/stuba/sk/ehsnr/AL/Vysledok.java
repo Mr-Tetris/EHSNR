@@ -1,4 +1,4 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
 public class Vysledok {
     private int pocetZa;
@@ -14,23 +14,23 @@ public class Vysledok {
     }
 
     public void pripocitajZa() {
-        pocetZa++;
+        pocetZa++; //pripočítanie hlasu za
         vyhodnot();
     }
 
     public void pripocitajProti() {
-        pocetProti++;
+        pocetProti++; //pripočítanie hlasu proti
         vyhodnot();
     }
 
     public void pripocitajZdrzaloSa() {
-        pocetZdrzaloSa++;
+        pocetZdrzaloSa++; //pripočítanie hlasu zdržal sa
         vyhodnot();
     }
 
     public boolean vyhodnot() {
-        int celkovyPocet = pocetZa + pocetProti;
-        return celkovyPocet > 0 && pocetZa > celkovyPocet / 2;
+        int celkovyPocet = pocetZa + pocetProti; //celkový počet hlasujúcich
+        return celkovyPocet > 0 && pocetZa > celkovyPocet / 2; //ak bol zákon schválený
     }
 
     public int getPocetZa() {
@@ -57,7 +57,7 @@ public class Vysledok {
                 ", pocetZdrzaloSa=" + pocetZdrzaloSa +
                 ", schvaleny=" + schvaleny +
                 '}';
-    }
+    } //metóda na výpis
 }
 
 

@@ -1,4 +1,4 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
 public class Uzivatel {
     private String meno;
@@ -7,16 +7,12 @@ public class Uzivatel {
     public Uzivatel(String meno) {
         this.meno = meno;
         this.uzHlasoval = false;
-    }
+    } //konštruktor
 
     public void hlasuj() {
-        if (uzHlasoval) {
+        if (uzHlasoval) { //ak už hlasoval
             throw new IllegalStateException("Tento užívateľ už hlasoval.");
         }
         uzHlasoval = true;
-    }
-
-    public void resetujHlasovanie() {
-        uzHlasoval = false;
     }
 }

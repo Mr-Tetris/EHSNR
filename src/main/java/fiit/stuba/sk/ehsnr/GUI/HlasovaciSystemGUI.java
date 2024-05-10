@@ -1,5 +1,7 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.GUI;
 
+import fiit.stuba.sk.ehsnr.AL.*;
+import fiit.stuba.sk.ehsnr.Controller.HlasovaciSystemController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -26,8 +28,7 @@ public class HlasovaciSystemGUI extends Application {
         nastavenia = new SystemoveNastavenia();
         HlasovaciSystem hlasovaciSystem = new HlasovaciSystem(nastavenia);
         sedenie = new Sedenie(hlasovaciSystem, nastavenia);
-        VotingDialog votingDialog = new VotingDialog();
-        votingController = new VotingController(hlasovaciSystem, votingDialog, this);
+        votingController = new VotingController(hlasovaciSystem, this);
         controller = new HlasovaciSystemController(sedenie, hlasovaciSystem, this, votingController);
         timerService = new TimerService();
     }
@@ -63,12 +64,12 @@ public class HlasovaciSystemGUI extends Application {
         primaryStage.show();
 
         checkVotingEligibility();
-    }
+    } // Úvodná obrazovka
 
     private void checkVotingEligibility() {
         boolean isEligible = nastavenia.getPocetHlasujucich() > 0 && nastavenia.getCasovyLimit() > 0 && !controller.getNavrhyNaAgendu().isEmpty();
         btnStartVoting.setDisable(!isEligible);
-    }
+    } // Kontrola oprávnenosti hlasovania
 
     private void handleSettings(Stage parentStage) {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
@@ -108,7 +109,7 @@ public class HlasovaciSystemGUI extends Application {
             nastavenia.setCasovyLimit(cas);
             checkVotingEligibility();
         });
-    }
+    } // Nastavenia hlasovania
 
 
     public void handleAddProposal(Stage currentStage) {
@@ -150,7 +151,7 @@ public class HlasovaciSystemGUI extends Application {
         } else {
             currentStage.close();
         }
-    }
+    } // Pridanie návrhu
 
 
     public void showConfirmationDialog(Stage stage, String message) {
@@ -163,13 +164,13 @@ public class HlasovaciSystemGUI extends Application {
         alert.getButtonTypes().setAll(closeButton);
 
         alert.showAndWait();
-    }
+    } // Potvrdenie pridania návrhu
     private void checkInitialVotingSetup() {
         boolean isReadyToStartVoting = !controller.getNavrhyNaAgendu().isEmpty() &&
                 nastavenia.getPocetHlasujucich() > 0 &&
                 nastavenia.getCasovyLimit() > 0;
         btnStartVoting.setDisable(!isReadyToStartVoting);
-    }
+    } // Kontrola počiatočného nastavenia hlasovania
 
     public void showVotingInterface(Navrh vybranyNavrh) {
         controller.zacniHlasovanie(vybranyNavrh);
@@ -225,13 +226,13 @@ public class HlasovaciSystemGUI extends Application {
         Scene scene = new Scene(layout, 300, 200);
         stage.setScene(scene);
         stage.showAndWait();
-    }
+    } // Rozhranie hlasovania
 
     private void disableVotingButtons(Button... buttons) {
         for (Button button : buttons) {
             button.setDisable(true);
         }
-    }
+    } // Zablokovanie tlačidiel hlasovania
 
     private void showVotingOptions(Stage primaryStage) {
         List<Navrh> navrhy = controller.getNavrhyNaAgendu();
@@ -268,7 +269,7 @@ public class HlasovaciSystemGUI extends Application {
             primaryStage.close();
             showVotingInterface(navrh);
         });
-    }
+    } // Možnosti hlasovania
 
     public void showResultsWindow(String lawName, boolean passed, Vysledok vysledok, Stage resultsStage) {
         resultsLayout = new VBox(10);
@@ -308,7 +309,7 @@ public class HlasovaciSystemGUI extends Application {
         resultsStage.setTitle("Výsledky hlasovania o zákone: " + lawName);
         resultsStage.setScene(scene);
         resultsStage.show();
-    }
+    } // Výsledky hlasovania
 
     public void updateResultsDisplay() {
         if (resultsLayout != null) {
@@ -339,9 +340,9 @@ public class HlasovaciSystemGUI extends Application {
         } else {
             System.out.println("Výsledkový layout nebol inicializovaný.");
         }
-    }
+    } // Aktualizácia zobrazenia výsledkov
 
     public static void main(String[] args) {
         launch(args);
-    }
+    } // Spustenie aplikácie
 }

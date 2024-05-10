@@ -1,7 +1,6 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
 import java.util.List;
-import java.util.ArrayList;
 
 public class Sedenie {
     private HlasovaciSystem hlasovaciSystem;
@@ -22,7 +21,6 @@ public class Sedenie {
 
     public void zahajSedenie(Navrh vybranyNavrh) {
         hlasovaciSystem.zacniHlasovanie(vybranyNavrh);
-        System.out.println("Hlasovanie o zakone '" + vybranyNavrh.getNazov() + "' začína.");
     }
 
     public void ukonciSedenie(String lawName) throws NoVoteException {

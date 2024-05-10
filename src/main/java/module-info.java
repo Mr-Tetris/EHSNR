@@ -11,6 +11,10 @@ module fiit.stuba.sk.ehsnr {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
 
-    opens fiit.stuba.sk.ehsnr to javafx.fxml;
-    exports fiit.stuba.sk.ehsnr;
+    exports fiit.stuba.sk.ehsnr.GUI;
+    opens fiit.stuba.sk.ehsnr.GUI to javafx.fxml;
+    exports fiit.stuba.sk.ehsnr.AL;
+    opens fiit.stuba.sk.ehsnr.AL to javafx.fxml;
+    exports fiit.stuba.sk.ehsnr.Controller;
+    opens fiit.stuba.sk.ehsnr.Controller to javafx.fxml;
 }

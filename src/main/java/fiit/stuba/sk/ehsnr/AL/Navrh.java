@@ -1,4 +1,4 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
 public abstract class Navrh {
     protected String nazov;
@@ -9,7 +9,7 @@ public abstract class Navrh {
         this.nazov = nazov;
         this.popis = popis;
         this.stav = "Predložený";
-    }
+    } //konštruktor
 
     public String getNazov() {
         return nazov;

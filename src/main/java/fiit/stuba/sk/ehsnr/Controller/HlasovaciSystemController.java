@@ -1,5 +1,7 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.Controller;
 
+import fiit.stuba.sk.ehsnr.AL.*;
+import fiit.stuba.sk.ehsnr.GUI.HlasovaciSystemGUI;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import java.util.List;
@@ -20,9 +22,6 @@ public class HlasovaciSystemController {
     public void pridajNavrh(Navrh navrh) {
         sedenie.pridajNavrhNaAgendu(navrh);
     }
-    public void odstranNavrh(String lawName) throws NoVoteException {
-        sedenie.ukonciSedenie(lawName);  // Toto zavolá metódu na ukončenie hlasovania a odstránenie návrhu
-    }
 
     public List<Navrh> getNavrhyNaAgendu() {
         return sedenie.getNavrhyNaAgende();
@@ -34,32 +33,32 @@ public class HlasovaciSystemController {
 
     public void voteFor(Navrh navrh, Label resultLabel, TimerService timerService) {
         if (hlasovaciSystem.isHlasovanieBezi()) {
-            hlasovaciSystem.pripocitajHlas(navrh.getNazov(), "za");
-            resultLabel.setText("Hlasovali ste: ZA");
-            timerService.continueTimer();
+            hlasovaciSystem.pripocitajHlas(navrh.getNazov(), "za"); // pridaj hlas
+            resultLabel.setText("Hlasovali ste: ZA"); // zobraz výsledok hlasovania
+            timerService.continueTimer(); // pokračuj v časovači
         }
     }
 
     public void voteAgainst(Navrh navrh, Label resultLabel, TimerService timerService) {
         if (hlasovaciSystem.isHlasovanieBezi()) {
-            hlasovaciSystem.pripocitajHlas(navrh.getNazov(), "proti");
-            resultLabel.setText("Hlasovali ste: PROTI");
-            timerService.continueTimer();
+            hlasovaciSystem.pripocitajHlas(navrh.getNazov(), "proti"); // pridaj hlas
+            resultLabel.setText("Hlasovali ste: PROTI");// zobraz výsledok hlasovania
+            timerService.continueTimer();// pokračuj v časovači
         }
     }
 
     public void abstain(Navrh navrh, Label resultLabel, TimerService timerService) {
         if (hlasovaciSystem.isHlasovanieBezi()) {
-            hlasovaciSystem.pripocitajHlas(navrh.getNazov(), "abstain");
-            resultLabel.setText("Zdržali ste sa hlasovania");
-            timerService.continueTimer();
+            hlasovaciSystem.pripocitajHlas(navrh.getNazov(), "abstain"); // pridaj hlas
+            resultLabel.setText("Zdržali ste sa hlasovania"); // zobraz výsledok hlasovania
+            timerService.continueTimer();// pokračuj v časovači
         }
     }
 
     public void finalizeVoting(String nazov, Label resultLabel) throws NoVoteException {
         votingController.finalizeVoting(nazov, resultLabel, (Boolean passed, Vysledok vysledok) -> {
-            Platform.runLater(() -> {
-                if (passed) {
+            Platform.runLater(() -> { // spusti vlákno na zobrazenie výsledku
+                if (passed) { // ak bol zákon schválený
                     resultLabel.setText("Zákon bol schválený.");
                 } else {
                     resultLabel.setText("Zákon nebol schválený.");
@@ -68,8 +67,5 @@ public class HlasovaciSystemController {
         });
     }
 
-    public List<Navrh> refreshProposalsList() {
-        return sedenie.getNavrhyNaAgende();
-    }
 }
 

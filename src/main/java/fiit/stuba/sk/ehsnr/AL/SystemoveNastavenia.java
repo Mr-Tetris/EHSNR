@@ -1,6 +1,7 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
 public class SystemoveNastavenia {
+    // Zapúzdrenie private premenných a pre nich public gettre a settre
     private int pocetHlasujucich;
     private int casovyLimit;
 

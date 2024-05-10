@@ -1,10 +1,7 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.stage.Stage;
 
 public class TimerService {
     private AnimationTimer timer;
@@ -23,8 +20,8 @@ public class TimerService {
     public void startTimer(int durationInSeconds, TimerCallback callback) {
         this.callback = callback;
         this.remainingSeconds = durationInSeconds;
-        startTime = System.currentTimeMillis();
-        endTime = startTime + durationInSeconds * 1000;
+        startTime = System.currentTimeMillis(); // Aktuálny čas v milisekundách
+        endTime = startTime + durationInSeconds * 1000; // Koncový čas v milisekundách
 
         if (timer != null) {
             timer.stop();  // Zastavíme predchádzajúci časovač ak existuje
@@ -33,12 +30,12 @@ public class TimerService {
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                long elapsedMillis = System.currentTimeMillis() - startTime;
-                remainingSeconds = (endTime - System.currentTimeMillis()) / 1000;
-                if (remainingSeconds <= 0) {
+                long elapsedMillis = System.currentTimeMillis() - startTime; // Uplynutý čas v milisekundách
+                remainingSeconds = (endTime - System.currentTimeMillis()) / 1000; // Zostávajúci čas v sekundách
+                if (remainingSeconds <= 0) { // Ak už uplynul celý čas
                     timer.stop();
                     remainingSeconds = 0;
-                    try {
+                    try { // Spustíme callback onFinish
                         Platform.runLater(() -> {
                             if (callback != null) {
                                 try {
@@ -48,12 +45,12 @@ public class TimerService {
                                 }
                             }
                         });
-                    } catch (Exception e) {
+                    } catch (Exception e) { // Ak sa nepodarí spustiť callback onFinish
                         e.printStackTrace();
                     }
-                } else {
+                } else { // Ak ešte neuplynul celý čas
                     if (callback != null) {
-                        Platform.runLater(() -> callback.onTick(remainingSeconds));
+                        Platform.runLater(() -> callback.onTick(remainingSeconds)); // Spustíme callback onTick
                     }
                 }
             }
@@ -61,14 +58,8 @@ public class TimerService {
         timer.start();
     }
 
-    public void stopTimer() {
-        if (timer != null) {
-            timer.stop();
-            remainingSeconds = 0;
-        }
-    }
 
-    public void continueTimer() {
+    public void continueTimer() { // Pokračovanie časovača
         if (timer != null && remainingSeconds > 0) {
             startTime = System.currentTimeMillis();
             endTime = startTime + remainingSeconds * 1000;
@@ -76,7 +67,4 @@ public class TimerService {
         }
     }
 
-    public long getRemainingSeconds() {
-        return remainingSeconds;
-    }
 }

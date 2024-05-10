@@ -1,5 +1,6 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
+import fiit.stuba.sk.ehsnr.GUI.HlasovaciSystemGUI;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -8,12 +9,10 @@ import java.util.function.BiConsumer;
 public class VotingController {
     private TimerService timerService;
     private HlasovaciSystem hlasovaciSystem;
-    private VotingDialog votingDialog;
     private HlasovaciSystemGUI gui;
 
-    public VotingController(HlasovaciSystem system, VotingDialog dialog, HlasovaciSystemGUI gui) {
+    public VotingController(HlasovaciSystem system, HlasovaciSystemGUI gui) {
         this.hlasovaciSystem = system;
-        this.votingDialog = dialog;
         this.gui = gui;
         this.timerService = new TimerService();
     }
@@ -24,19 +23,19 @@ public class VotingController {
             return;
         }
 
-        hlasovaciSystem.generujZvysokHlasov(lawName);
-        hlasovaciSystem.ukonciHlasovanie(lawName);
+        hlasovaciSystem.generujZvysokHlasov(lawName); // vygeneruj zvyšok hlasov
+        hlasovaciSystem.ukonciHlasovanie(lawName); // ukonči hlasovanie
 
         if (!hlasovaciSystem.vsetciHlasovali()) {
             throw new NoVoteException("Hlasovanie bolo neúspešné z dôvodu neodhlasovania plného počtu hlasujúcich.");
-        }
+        } // ak nie všetci hlasovali, hlasovanie bolo neúspešné
 
-        boolean lawPassed = hlasovaciSystem.evaluateLaw(lawName);
-        Vysledok vysledok = hlasovaciSystem.getVysledkyHlasovania().get(lawName);
+        boolean lawPassed = hlasovaciSystem.evaluateLaw(lawName); // vyhodnot zákon
+        Vysledok vysledok = hlasovaciSystem.getVysledkyHlasovania().get(lawName); // získaj výsledok hlasovania
 
         Platform.runLater(() -> {
             resultHandler.accept(lawPassed, vysledok);
             gui.showResultsWindow(lawName, lawPassed, vysledok, new Stage());
-        });
+        }); // zobraz výsledky hlasovania
     }
 }

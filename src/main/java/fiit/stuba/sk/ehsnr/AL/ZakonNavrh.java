@@ -1,13 +1,10 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
-public class ReferendumNavrh extends Navrh {
+public class ZakonNavrh extends Navrh {
     //Dedenie konštruktora z triedy Navrh
-    //Polymorfizmus - referenciu typu Navrh môžeme priradiť objekt typu ReferendumNavrh
-    private String otazka;
-
-    public ReferendumNavrh(String nazov, String popis, String otazka) {
+    //Polymorfizmus - referenciu typu Navrh môžeme priradiť objekt typu ZakonNavrh
+    public ZakonNavrh(String nazov, String popis) {
         super(nazov, popis);
-        this.otazka = otazka;
     }
 
     @Override
@@ -17,5 +14,5 @@ public class ReferendumNavrh extends Navrh {
         } else {
             this.stav = "Zamietnutý";
         }
-    }
+    } //metóda na aktualizáciu stavu na základe výsledku hlasovania
 }

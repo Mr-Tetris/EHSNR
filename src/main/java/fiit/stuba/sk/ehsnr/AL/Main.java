@@ -1,5 +1,7 @@
-package fiit.stuba.sk.ehsnr;
+package fiit.stuba.sk.ehsnr.AL;
 
+
+import fiit.stuba.sk.ehsnr.GUI.HlasovaciSystemGUI;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,5 +13,5 @@ public class Main {
 
     private static void launchGUI(SystemoveNastavenia nastavenia, Sedenie sedenie) {
         javafx.application.Application.launch(HlasovaciSystemGUI.class);
-    }
+    } // launchGUI
 }
